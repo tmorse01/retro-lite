@@ -146,6 +146,7 @@ export function Column({
                   updatingCards={updatingCards}
                   deletingCards={deletingCards}
                   isVotingPhase={isVotingPhase}
+                  phase={phase}
                 />
               );
             })}
@@ -173,6 +174,7 @@ export function Column({
                     onUngroupCard={onUngroupCard}
                     selectedCards={selectedCards}
                     allCards={cards}
+                    phase={phase}
                   />
                 ))}
               </div>

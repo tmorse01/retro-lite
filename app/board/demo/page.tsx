@@ -41,6 +41,7 @@ const initialCards: Card[] = [
     content: "Great collaboration with the design team.",
     author: "Alice",
     votes: 3,
+    group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -51,6 +52,7 @@ const initialCards: Card[] = [
     content: "CI pipeline is much faster now.",
     author: "Bob",
     votes: 5,
+    group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -61,6 +63,7 @@ const initialCards: Card[] = [
     content: "Too many last-minute scope changes.",
     author: "Charlie",
     votes: 4,
+    group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -71,6 +74,7 @@ const initialCards: Card[] = [
     content: "We need clearer acceptance criteria.",
     author: "Diana",
     votes: 2,
+    group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -81,6 +85,7 @@ const initialCards: Card[] = [
     content: "Define 'ready for development' checklist.",
     author: "Eve",
     votes: 6,
+    group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -91,6 +96,7 @@ const initialCards: Card[] = [
     content: "Schedule weekly sync with product.",
     author: "Frank",
     votes: 1,
+    group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -111,6 +117,7 @@ export default function DemoBoardPage() {
       content,
       author: author || null,
       votes: 0,
+      group_id: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -132,9 +139,7 @@ export default function DemoBoardPage() {
   ) => {
     setCards(
       cards.map((card) =>
-        card.id === cardId
-          ? { ...card, content, author: author || null }
-          : card
+        card.id === cardId ? { ...card, content, author: author || null } : card
       )
     );
   };
@@ -157,6 +162,7 @@ export default function DemoBoardPage() {
             key={column.id}
             column={column}
             cards={getCardsForColumn(column.id)}
+            groups={[]}
             onAddCard={handleAddCard}
             onVote={handleVote}
             onUpdateCard={handleUpdateCard}
@@ -167,4 +173,3 @@ export default function DemoBoardPage() {
     </BoardLayout>
   );
 }
-
