@@ -167,11 +167,11 @@ export function CardItem({
               voteIntensity > 0.8 && "border-primary bg-primary/10",
               isDeleting && "opacity-50",
               isGroupingMode && isSelected && "ring-2 ring-primary",
-              isGroupingMode && "pl-10"
+              isGroupingMode && "flex items-center gap-3"
             )}
           >
             {isGroupingMode && (
-              <div className="absolute top-2 left-2">
+              <div className="flex-shrink-0">
                 <Checkbox
                   checked={isSelected}
                   onCheckedChange={(checked) =>
@@ -181,7 +181,7 @@ export function CardItem({
               </div>
             )}
             {isEditing ? (
-              <div className="space-y-3">
+              <div className={cn("space-y-3", isGroupingMode && "flex-1")}>
                 <Textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
@@ -213,7 +213,7 @@ export function CardItem({
                 </div>
               </div>
             ) : (
-              <>
+              <div className={cn(isGroupingMode && "flex-1")}>
                 <p className="text-sm text-foreground mb-2">{card.content}</p>
                 {card.author && (
                   <p className="text-xs text-muted-foreground mb-3">
@@ -253,43 +253,34 @@ export function CardItem({
                       </Badge>
                     </div>
                   )}
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setIsEditing(true)}
-                      disabled={isDeleting || isUpdating}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={handleDeleteClick}
-                      disabled={isDeleting}
-                    >
-                      {isDeleting ? (
-                        <Spinner size="sm" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </ContextMenuTrigger>
 
         <ContextMenuContent>
+          <ContextMenuItem
+            onClick={() => setIsEditing(true)}
+            disabled={isDeleting || isUpdating}
+          >
+            <Edit2 className="h-4 w-4 mr-2" />
+            Edit Card
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={handleDeleteClick}
+            disabled={isDeleting}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete Card
+          </ContextMenuItem>
           {isGroupingMode && (
             <>
+              <ContextMenuSeparator />
               <ContextMenuItem onClick={handleToggleSelect}>
                 {isSelected ? "Deselect" : "Select"} Card
               </ContextMenuItem>
-              <ContextMenuSeparator />
             </>
           )}
           {isGroupingMode && onCreateGroup && (
