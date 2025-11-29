@@ -28,6 +28,7 @@ export function BoardView({ boardId }: BoardViewProps) {
     handleRenameGroup,
     handleDeleteGroup,
     handleUngroupCard,
+    handleAddCardsToGroup,
     handlePhaseChange,
   } = useBoard(boardId);
 
@@ -177,6 +178,7 @@ export function BoardView({ boardId }: BoardViewProps) {
             onRenameGroup={handleRenameGroup}
             onDeleteGroup={handleDeleteGroup}
             onUngroupCard={handleUngroupCard}
+            onAddCardsToGroup={handleAddCardsToGroup}
             isAddingCard={loadingActions.addingCard === column.id}
             votingCards={loadingActions.voting}
             updatingCards={loadingActions.updating}

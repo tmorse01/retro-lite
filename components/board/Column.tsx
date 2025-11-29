@@ -27,6 +27,7 @@ interface ColumnProps {
   onRenameGroup?: (groupId: string, name: string) => void;
   onDeleteGroup?: (groupId: string) => void;
   onUngroupCard?: (cardId: string) => void;
+  onAddCardsToGroup?: (groupId: string, cardIds: string[]) => void;
   isAddingCard?: boolean;
   votingCards?: Set<string>;
   updatingCards?: Set<string>;
@@ -48,6 +49,7 @@ export function Column({
   onRenameGroup,
   onDeleteGroup,
   onUngroupCard,
+  onAddCardsToGroup,
   isAddingCard = false,
   votingCards = new Set(),
   updatingCards = new Set(),
@@ -125,12 +127,14 @@ export function Column({
                   key={group.id}
                   group={group}
                   cards={groupCards}
+                  allColumnCards={cards}
                   onVote={onVote}
                   onUpdateCard={onUpdateCard}
                   onDeleteCard={onDeleteCard}
                   onRenameGroup={onRenameGroup || (() => {})}
                   onDeleteGroup={onDeleteGroup || (() => {})}
                   onUngroupCard={onUngroupCard || (() => {})}
+                  onAddCardsToGroup={onAddCardsToGroup}
                   isGroupingMode={isGroupingMode}
                   selectedCards={selectedCards}
                   onSelectChange={onSelectChange}

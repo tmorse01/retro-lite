@@ -254,39 +254,61 @@ export function useBoard(boardId: string) {
     [boardId]
   );
 
-  const handleVote = useCallback(async (cardId: string) => {
-    // Optimistic update: increment vote count immediately
-    setBoard((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        cards: prev.cards.map((card) =>
-          card.id === cardId ? { ...card, votes: card.votes + 1 } : card
-        ),
-      };
-    });
+  const handleVote = useCallback(
+    async (cardId: string) => {
+      // Check if board is in voting phase
+      if (!board || board.phase !== "voting") {
+        return; // Don't allow voting if not in voting phase
+      }
 
-    // Clear any existing timeout for this card
-    const existingTimeout = loadingTimeouts.current.voting.get(cardId);
-    if (existingTimeout) {
-      clearTimeout(existingTimeout);
-    }
-
-    // Set delayed loading state
-    const timeoutId = setTimeout(() => {
-      setLoadingActions((prev) => ({
-        ...prev,
-        voting: new Set(prev.voting).add(cardId),
-      }));
-    }, LOADING_DELAY_MS);
-    loadingTimeouts.current.voting.set(cardId, timeoutId);
-
-    try {
-      const response = await fetch(`/api/cards/${cardId}/vote`, {
-        method: "POST",
+      // Optimistic update: increment vote count immediately
+      setBoard((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          cards: prev.cards.map((card) =>
+            card.id === cardId ? { ...card, votes: card.votes + 1 } : card
+          ),
+        };
       });
 
-      if (!response.ok) {
+      // Clear any existing timeout for this card
+      const existingTimeout = loadingTimeouts.current.voting.get(cardId);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+      }
+
+      // Set delayed loading state
+      const timeoutId = setTimeout(() => {
+        setLoadingActions((prev) => ({
+          ...prev,
+          voting: new Set(prev.voting).add(cardId),
+        }));
+      }, LOADING_DELAY_MS);
+      loadingTimeouts.current.voting.set(cardId, timeoutId);
+
+      try {
+        const response = await fetch(`/api/cards/${cardId}/vote`, {
+          method: "POST",
+        });
+
+        if (!response.ok) {
+          // Rollback optimistic update on error
+          setBoard((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              cards: prev.cards.map((card) =>
+                card.id === cardId
+                  ? { ...card, votes: Math.max(0, card.votes - 1) }
+                  : card
+              ),
+            };
+          });
+          console.error("Error voting:", await response.text());
+        }
+        // Realtime subscription will handle updating the UI with the real vote count
+      } catch (error) {
         // Rollback optimistic update on error
         setBoard((prev) => {
           if (!prev) return null;
@@ -299,37 +321,23 @@ export function useBoard(boardId: string) {
             ),
           };
         });
-        console.error("Error voting:", await response.text());
+        console.error("Error voting:", error);
+      } finally {
+        // Clear timeout if it hasn't fired yet
+        const timeout = loadingTimeouts.current.voting.get(cardId);
+        if (timeout) {
+          clearTimeout(timeout);
+          loadingTimeouts.current.voting.delete(cardId);
+        }
+        setLoadingActions((prev) => {
+          const newVoting = new Set(prev.voting);
+          newVoting.delete(cardId);
+          return { ...prev, voting: newVoting };
+        });
       }
-      // Realtime subscription will handle updating the UI with the real vote count
-    } catch (error) {
-      // Rollback optimistic update on error
-      setBoard((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          cards: prev.cards.map((card) =>
-            card.id === cardId
-              ? { ...card, votes: Math.max(0, card.votes - 1) }
-              : card
-          ),
-        };
-      });
-      console.error("Error voting:", error);
-    } finally {
-      // Clear timeout if it hasn't fired yet
-      const timeout = loadingTimeouts.current.voting.get(cardId);
-      if (timeout) {
-        clearTimeout(timeout);
-        loadingTimeouts.current.voting.delete(cardId);
-      }
-      setLoadingActions((prev) => {
-        const newVoting = new Set(prev.voting);
-        newVoting.delete(cardId);
-        return { ...prev, voting: newVoting };
-      });
-    }
-  }, []);
+    },
+    [board]
+  );
 
   const handleUpdateCard = useCallback(
     async (cardId: string, content: string, author?: string) => {
@@ -708,6 +716,62 @@ export function useBoard(boardId: string) {
     [board]
   );
 
+  const handleAddCardsToGroup = useCallback(
+    async (groupId: string, cardIds: string[]) => {
+      if (!board || cardIds.length === 0) return;
+
+      // Optimistic update
+      setBoard((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          cards: prev.cards.map((card) =>
+            cardIds.includes(card.id) ? { ...card, group_id: groupId } : card
+          ),
+        };
+      });
+
+      try {
+        const response = await fetch(`/api/groups/${groupId}/cards`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cardIds }),
+        });
+
+        if (!response.ok) {
+          // Rollback on error
+          setBoard((prev) => {
+            if (!prev) return null;
+            const originalCards = board.cards;
+            return {
+              ...prev,
+              cards: prev.cards.map((card) => {
+                const original = originalCards.find((c) => c.id === card.id);
+                return original ? original : card;
+              }),
+            };
+          });
+          console.error("Error adding cards to group:", await response.text());
+        }
+      } catch (error) {
+        // Rollback on error
+        setBoard((prev) => {
+          if (!prev) return null;
+          const originalCards = board.cards;
+          return {
+            ...prev,
+            cards: prev.cards.map((card) => {
+              const original = originalCards.find((c) => c.id === card.id);
+              return original ? original : card;
+            }),
+          };
+        });
+        console.error("Error adding cards to group:", error);
+      }
+    },
+    [board]
+  );
+
   const handlePhaseChange = useCallback(
     async (phase: "gathering" | "grouping" | "voting" | "actions") => {
       if (!board) return;
@@ -767,6 +831,7 @@ export function useBoard(boardId: string) {
     handleRenameGroup,
     handleDeleteGroup,
     handleUngroupCard,
+    handleAddCardsToGroup,
     handlePhaseChange,
   };
 }

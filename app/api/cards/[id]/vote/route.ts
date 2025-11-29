@@ -9,10 +9,10 @@ export async function POST(
     const { id } = await params;
     const supabase = createServerClient();
 
-    // Get current vote count
+    // Get card with board_id to check phase
     const { data: card, error: fetchError } = await supabase
       .from("cards")
-      .select("votes")
+      .select("votes, board_id")
       .eq("id", id)
       .single();
 
@@ -21,6 +21,29 @@ export async function POST(
       return NextResponse.json(
         { error: "Card not found" },
         { status: 404 }
+      );
+    }
+
+    // Get board to check phase
+    const { data: board, error: boardError } = await supabase
+      .from("boards")
+      .select("phase")
+      .eq("id", card.board_id)
+      .single();
+
+    if (boardError || !board) {
+      console.error("Error fetching board:", boardError);
+      return NextResponse.json(
+        { error: "Board not found" },
+        { status: 404 }
+      );
+    }
+
+    // Only allow voting in voting phase
+    if (board.phase !== "voting") {
+      return NextResponse.json(
+        { error: "Voting is only allowed in the voting phase" },
+        { status: 403 }
       );
     }
 

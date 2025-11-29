@@ -9,6 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { LoadingOverlay } from "@/components/ui/spinner";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { Card } from "@/types/database";
 
@@ -42,6 +50,7 @@ export function CardItem({
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(card.content);
   const [author, setAuthor] = useState(card.author || "");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleSave = () => {
     onUpdate(card.id, content, author || undefined);
@@ -54,6 +63,15 @@ export function CardItem({
     setIsEditing(false);
   };
 
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    onDelete(card.id);
+    setShowDeleteConfirm(false);
+  };
+
   // Visual intensity based on votes
   const voteIntensity = Math.min(card.votes / 5, 1); // Normalize to 0-1, max at 5 votes
 
@@ -61,7 +79,7 @@ export function CardItem({
     <LoadingOverlay isLoading={isDeleting}>
       <div
         className={cn(
-          "group relative bg-white rounded-lg border p-4 transition-all hover:shadow-md hover:-translate-y-0.5",
+          "group relative bg-white rounded-lg border p-4 transition-all hover:shadow-md hover:-translate-y-0.5 m-2",
           voteIntensity > 0.5 && "border-primary/50 bg-primary/5",
           voteIntensity > 0.8 && "border-primary bg-primary/10",
           isDeleting && "opacity-50",
@@ -166,7 +184,7 @@ export function CardItem({
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-destructive hover:text-destructive"
-                  onClick={() => onDelete(card.id)}
+                  onClick={handleDeleteClick}
                   disabled={isDeleting}
                 >
                   {isDeleting ? (
@@ -180,6 +198,54 @@ export function CardItem({
           </>
         )}
       </div>
+
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Card</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this card? This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-muted rounded-lg p-3 border">
+              <p className="text-sm text-foreground">{card.content}</p>
+              {card.author && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  — {card.author}
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </LoadingOverlay>
   );
 }
