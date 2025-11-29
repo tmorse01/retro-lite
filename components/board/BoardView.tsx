@@ -179,6 +179,7 @@ export function BoardView({ boardId }: BoardViewProps) {
             onDeleteGroup={handleDeleteGroup}
             onUngroupCard={handleUngroupCard}
             onAddCardsToGroup={handleAddCardsToGroup}
+            onCreateGroup={handleCreateGroup}
             isAddingCard={loadingActions.addingCard === column.id}
             votingCards={loadingActions.voting}
             updatingCards={loadingActions.updating}

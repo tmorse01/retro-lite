@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Share2, Download, Layers, X, Check } from "lucide-react";
+import { Share2, Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,15 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ShareBoardDialog } from "./ShareBoardDialog";
 import { PhaseIndicator } from "./PhaseIndicator";
@@ -49,21 +40,10 @@ export function BoardLayout({
   onClearSelection,
 }: BoardLayoutProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [createGroupDialogOpen, setCreateGroupDialogOpen] = useState(false);
-  const [groupName, setGroupName] = useState("");
 
   const handleExport = () => {
     // Placeholder for export functionality
     alert("Export functionality coming soon!");
-  };
-
-  const handleCreateGroup = () => {
-    if (groupName.trim() && onCreateGroup) {
-      onCreateGroup(groupName.trim());
-      setGroupName("");
-      setCreateGroupDialogOpen(false);
-      onClearSelection?.();
-    }
   };
 
   const selectedCount = selectedCards.size;
@@ -97,16 +77,6 @@ export function BoardLayout({
                   <Badge variant="secondary" className="mr-2">
                     {selectedCount} selected
                   </Badge>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => {
-                      setCreateGroupDialogOpen(true);
-                    }}
-                  >
-                    <Layers className="h-4 w-4 mr-2" />
-                    Create Group
-                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
@@ -155,49 +125,6 @@ export function BoardLayout({
         onOpenChange={setShareDialogOpen}
         boardId={boardId}
       />
-
-      <Dialog
-        open={createGroupDialogOpen}
-        onOpenChange={setCreateGroupDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Group</DialogTitle>
-            <DialogDescription>
-              Enter a name for the group containing {selectedCount} selected
-              card{selectedCount !== 1 ? "s" : ""}.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="Group name (e.g., CI/CD Issues)"
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && groupName.trim()) {
-                  handleCreateGroup();
-                }
-              }}
-              autoFocus
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setCreateGroupDialogOpen(false);
-                setGroupName("");
-              }}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleCreateGroup} disabled={!groupName.trim()}>
-              <Check className="h-4 w-4 mr-2" />
-              Create Group
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

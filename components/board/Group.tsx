@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Edit2, Trash2, X, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit2, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ interface GroupProps {
   group: GroupType;
   cards: Card[];
   allColumnCards?: Card[]; // All cards in the column (for filtering selected cards)
+  allColumnGroups?: GroupType[]; // All groups in the column
   onVote: (cardId: string) => void;
   onUpdateCard: (cardId: string, content: string, author?: string) => void;
   onDeleteCard: (cardId: string) => void;
@@ -20,6 +21,7 @@ interface GroupProps {
   onDeleteGroup: (groupId: string) => void;
   onUngroupCard: (cardId: string) => void;
   onAddCardsToGroup?: (groupId: string, cardIds: string[]) => void;
+  onCreateGroup?: (columnId: string, name: string, cardIds: string[]) => void;
   isGroupingMode?: boolean;
   selectedCards?: Set<string>;
   onSelectChange?: (cardId: string, selected: boolean) => void;
@@ -33,6 +35,7 @@ export function Group({
   group,
   cards,
   allColumnCards = [],
+  allColumnGroups = [],
   onVote,
   onUpdateCard,
   onDeleteCard,
@@ -40,6 +43,7 @@ export function Group({
   onDeleteGroup,
   onUngroupCard,
   onAddCardsToGroup,
+  onCreateGroup,
   isGroupingMode = false,
   selectedCards = new Set(),
   onSelectChange,
@@ -53,30 +57,6 @@ export function Group({
   const [renameValue, setRenameValue] = useState(group.name);
 
   const totalVotes = cards.reduce((sum, card) => sum + card.votes, 0);
-
-  // Get selected cards that are in the same column as this group
-  // Only include cards that are in the same column and not already in this group
-  const selectedCardsInColumn = Array.from(selectedCards).filter((cardId) => {
-    const card = allColumnCards.find((c) => c.id === cardId);
-    if (!card) return false;
-    // Card must be in the same column as the group
-    if (card.column_id !== group.column_id) return false;
-    // Card should not already be in this group
-    if (card.group_id === group.id) return false;
-    return true;
-  });
-
-  const hasSelectedCards = selectedCardsInColumn.length > 0;
-
-  const handleAddSelectedCards = () => {
-    if (onAddCardsToGroup && hasSelectedCards) {
-      onAddCardsToGroup(group.id, selectedCardsInColumn);
-      // Clear selection for the cards that were added
-      selectedCardsInColumn.forEach((cardId) => {
-        onSelectChange?.(cardId, false);
-      });
-    }
-  };
 
   const handleRename = () => {
     if (renameValue.trim() && renameValue.trim() !== group.name) {
@@ -144,20 +124,6 @@ export function Group({
         </div>
         {!isRenaming && (
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            {isGroupingMode && hasSelectedCards && onAddCardsToGroup && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs mr-1"
-                onClick={handleAddSelectedCards}
-                title={`Add ${selectedCardsInColumn.length} selected card${
-                  selectedCardsInColumn.length !== 1 ? "s" : ""
-                } to this group`}
-              >
-                <Plus className="h-3.5 w-3.5 mr-1" />
-                Add {selectedCardsInColumn.length}
-              </Button>
-            )}
             <Button
               variant="ghost"
               size="icon"
@@ -200,18 +166,13 @@ export function Group({
                   isSelected={selectedCards.has(card.id)}
                   onSelectChange={onSelectChange}
                   isVotingPhase={isVotingPhase}
+                  groups={allColumnGroups}
+                  onCreateGroup={onCreateGroup}
+                  onAddCardsToGroup={onAddCardsToGroup}
+                  onUngroupCard={onUngroupCard}
+                  selectedCards={selectedCards}
+                  allCards={allColumnCards}
                 />
-                {isGroupingMode && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-2 right-2 h-6 text-xs"
-                    onClick={() => onUngroupCard(card.id)}
-                  >
-                    <X className="h-3 w-3 mr-1" />
-                    Ungroup
-                  </Button>
-                )}
               </div>
             ))
           )}

@@ -28,6 +28,7 @@ interface ColumnProps {
   onDeleteGroup?: (groupId: string) => void;
   onUngroupCard?: (cardId: string) => void;
   onAddCardsToGroup?: (groupId: string, cardIds: string[]) => void;
+  onCreateGroup?: (columnId: string, name: string, cardIds: string[]) => void;
   isAddingCard?: boolean;
   votingCards?: Set<string>;
   updatingCards?: Set<string>;
@@ -50,6 +51,7 @@ export function Column({
   onDeleteGroup,
   onUngroupCard,
   onAddCardsToGroup,
+  onCreateGroup,
   isAddingCard = false,
   votingCards = new Set(),
   updatingCards = new Set(),
@@ -128,6 +130,7 @@ export function Column({
                   group={group}
                   cards={groupCards}
                   allColumnCards={cards}
+                  allColumnGroups={columnGroups}
                   onVote={onVote}
                   onUpdateCard={onUpdateCard}
                   onDeleteCard={onDeleteCard}
@@ -135,6 +138,7 @@ export function Column({
                   onDeleteGroup={onDeleteGroup || (() => {})}
                   onUngroupCard={onUngroupCard || (() => {})}
                   onAddCardsToGroup={onAddCardsToGroup}
+                  onCreateGroup={onCreateGroup}
                   isGroupingMode={isGroupingMode}
                   selectedCards={selectedCards}
                   onSelectChange={onSelectChange}
@@ -163,6 +167,12 @@ export function Column({
                     isSelected={selectedCards.has(card.id)}
                     onSelectChange={onSelectChange}
                     isVotingPhase={isVotingPhase}
+                    groups={groups}
+                    onCreateGroup={onCreateGroup}
+                    onAddCardsToGroup={onAddCardsToGroup}
+                    onUngroupCard={onUngroupCard}
+                    selectedCards={selectedCards}
+                    allCards={cards}
                   />
                 ))}
               </div>
