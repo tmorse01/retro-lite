@@ -45,10 +45,22 @@ export async function GET(
       console.error("Error fetching cards:", cardsError);
     }
 
+    // Fetch groups
+    const { data: groups, error: groupsError } = await supabase
+      .from("groups")
+      .select("*")
+      .eq("board_id", id)
+      .order("sort_order");
+
+    if (groupsError) {
+      console.error("Error fetching groups:", groupsError);
+    }
+
     return NextResponse.json({
       ...board,
       columns: columns || [],
       cards: cards || [],
+      groups: groups || [],
     });
   } catch (error) {
     console.error("Error in GET /api/boards/[id]:", error);

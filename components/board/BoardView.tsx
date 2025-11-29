@@ -1,17 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { BoardLayout } from "./BoardLayout";
 import { Column } from "./Column";
 import { useBoard } from "@/hooks/useBoard";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Card, Board } from "@/types/database";
+import type { Card } from "@/types/database";
 
 interface BoardViewProps {
   boardId: string;
 }
 
 export function BoardView({ boardId }: BoardViewProps) {
+  const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
+
   const {
     board,
     loading,
@@ -21,7 +24,48 @@ export function BoardView({ boardId }: BoardViewProps) {
     handleVote,
     handleUpdateCard,
     handleDeleteCard,
+    handleCreateGroup,
+    handleRenameGroup,
+    handleDeleteGroup,
+    handleUngroupCard,
+    handlePhaseChange,
   } = useBoard(boardId);
+
+  const handleSelectChange = (cardId: string, selected: boolean) => {
+    setSelectedCards((prev) => {
+      const next = new Set(prev);
+      if (selected) {
+        next.add(cardId);
+      } else {
+        next.delete(cardId);
+      }
+      return next;
+    });
+  };
+
+  const handleCreateGroupFromSelection = async (name: string) => {
+    if (!board || selectedCards.size === 0) return;
+
+    // Group selected cards by column
+    const cardsByColumn = new Map<string, string[]>();
+    Array.from(selectedCards).forEach((cardId) => {
+      const card = board.cards.find((c) => c.id === cardId);
+      if (card) {
+        const existing = cardsByColumn.get(card.column_id) || [];
+        existing.push(cardId);
+        cardsByColumn.set(card.column_id, existing);
+      }
+    });
+
+    // Create a group for each column that has selected cards
+    for (const [columnId, cardIds] of cardsByColumn.entries()) {
+      if (cardIds.length > 0) {
+        await handleCreateGroup(columnId, name, cardIds);
+      }
+    }
+
+    setSelectedCards(new Set());
+  };
 
   if (loading) {
     return (
@@ -100,11 +144,12 @@ export function BoardView({ boardId }: BoardViewProps) {
       .sort((a, b) => b.votes - a.votes);
   };
 
-  const handlePhaseChange = (newPhase: Board['phase']) => {
-    if (board) {
-      setBoard({ ...board, phase: newPhase });
-    }
+  const getGroupsForColumn = (columnId: string) => {
+    return board.groups.filter((group) => group.column_id === columnId);
   };
+
+  // Automatically enable grouping mode when phase is "grouping"
+  const isGroupingMode = board.phase === "grouping";
 
   return (
     <BoardLayout
@@ -112,6 +157,11 @@ export function BoardView({ boardId }: BoardViewProps) {
       boardId={board.id}
       phase={board.phase}
       onPhaseChange={handlePhaseChange}
+      isGroupingMode={isGroupingMode}
+      selectedCards={selectedCards}
+      onCreateGroup={handleCreateGroupFromSelection}
+      onClearSelection={() => setSelectedCards(new Set())}
+      board={board}
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {sortedColumns.map((column) => (
@@ -119,14 +169,22 @@ export function BoardView({ boardId }: BoardViewProps) {
             key={column.id}
             column={column}
             cards={getCardsForColumn(column.id)}
+            groups={getGroupsForColumn(column.id)}
             onAddCard={handleAddCard}
             onVote={handleVote}
             onUpdateCard={handleUpdateCard}
             onDeleteCard={handleDeleteCard}
+            onRenameGroup={handleRenameGroup}
+            onDeleteGroup={handleDeleteGroup}
+            onUngroupCard={handleUngroupCard}
             isAddingCard={loadingActions.addingCard === column.id}
             votingCards={loadingActions.voting}
             updatingCards={loadingActions.updating}
             deletingCards={loadingActions.deleting}
+            isGroupingMode={isGroupingMode}
+            selectedCards={selectedCards}
+            onSelectChange={handleSelectChange}
+            phase={board.phase}
           />
         ))}
       </div>

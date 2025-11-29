@@ -8,32 +8,54 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { CardItem } from "./CardItem";
-import type { Card, Column as ColumnType } from "@/types/database";
+import { Group } from "./Group";
+import type {
+  Card,
+  Column as ColumnType,
+  Group as GroupType,
+  BoardPhase,
+} from "@/types/database";
 
 interface ColumnProps {
   column: ColumnType;
   cards: Card[];
+  groups: GroupType[];
   onAddCard: (columnId: string, content: string, author?: string) => void;
   onVote: (cardId: string) => void;
   onUpdateCard: (cardId: string, content: string, author?: string) => void;
   onDeleteCard: (cardId: string) => void;
+  onRenameGroup?: (groupId: string, name: string) => void;
+  onDeleteGroup?: (groupId: string) => void;
+  onUngroupCard?: (cardId: string) => void;
   isAddingCard?: boolean;
   votingCards?: Set<string>;
   updatingCards?: Set<string>;
   deletingCards?: Set<string>;
+  isGroupingMode?: boolean;
+  selectedCards?: Set<string>;
+  onSelectChange?: (cardId: string, selected: boolean) => void;
+  phase?: BoardPhase;
 }
 
 export function Column({
   column,
   cards,
+  groups = [],
   onAddCard,
   onVote,
   onUpdateCard,
   onDeleteCard,
+  onRenameGroup,
+  onDeleteGroup,
+  onUngroupCard,
   isAddingCard = false,
   votingCards = new Set(),
   updatingCards = new Set(),
   deletingCards = new Set(),
+  isGroupingMode = false,
+  selectedCards = new Set(),
+  onSelectChange,
+  phase = "gathering",
 }: ColumnProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [content, setContent] = useState("");
@@ -55,6 +77,20 @@ export function Column({
   };
 
   const totalVotes = cards.reduce((sum, card) => sum + card.votes, 0);
+  const isVotingPhase = phase === "voting";
+
+  // Separate cards into grouped and ungrouped
+  const groupedCardIds = new Set(
+    groups.flatMap((group) =>
+      cards.filter((card) => card.group_id === group.id).map((card) => card.id)
+    )
+  );
+  const ungroupedCards = cards.filter(
+    (card) => !card.group_id || !groupedCardIds.has(card.id)
+  );
+  const columnGroups = groups
+    .filter((group) => group.column_id === column.id)
+    .sort((a, b) => a.sort_order - b.sort_order);
 
   return (
     <div className="flex flex-col h-full bg-white rounded-lg border p-4">
@@ -71,25 +107,63 @@ export function Column({
         </div>
       </div>
 
-      {/* Cards List */}
+      {/* Groups and Cards List */}
       <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pt-2">
         {cards.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
             No items yet. Add the first card.
           </div>
         ) : (
-          cards.map((card) => (
-            <CardItem
-              key={card.id}
-              card={card}
-              onVote={onVote}
-              onUpdate={onUpdateCard}
-              onDelete={onDeleteCard}
-              isVoting={votingCards.has(card.id)}
-              isUpdating={updatingCards.has(card.id)}
-              isDeleting={deletingCards.has(card.id)}
-            />
-          ))
+          <>
+            {/* Display Groups */}
+            {columnGroups.map((group) => {
+              const groupCards = cards.filter(
+                (card) => card.group_id === group.id
+              );
+              return (
+                <Group
+                  key={group.id}
+                  group={group}
+                  cards={groupCards}
+                  onVote={onVote}
+                  onUpdateCard={onUpdateCard}
+                  onDeleteCard={onDeleteCard}
+                  onRenameGroup={onRenameGroup || (() => {})}
+                  onDeleteGroup={onDeleteGroup || (() => {})}
+                  onUngroupCard={onUngroupCard || (() => {})}
+                  isGroupingMode={isGroupingMode}
+                  selectedCards={selectedCards}
+                  onSelectChange={onSelectChange}
+                  votingCards={votingCards}
+                  updatingCards={updatingCards}
+                  deletingCards={deletingCards}
+                  isVotingPhase={isVotingPhase}
+                />
+              );
+            })}
+
+            {/* Display Ungrouped Cards */}
+            {ungroupedCards.length > 0 && (
+              <div className="space-y-3">
+                {ungroupedCards.map((card) => (
+                  <CardItem
+                    key={card.id}
+                    card={card}
+                    onVote={onVote}
+                    onUpdate={onUpdateCard}
+                    onDelete={onDeleteCard}
+                    isVoting={votingCards.has(card.id)}
+                    isUpdating={updatingCards.has(card.id)}
+                    isDeleting={deletingCards.has(card.id)}
+                    isGroupingMode={isGroupingMode}
+                    isSelected={selectedCards.has(card.id)}
+                    onSelectChange={onSelectChange}
+                    isVotingPhase={isVotingPhase}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 

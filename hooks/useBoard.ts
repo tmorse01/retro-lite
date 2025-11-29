@@ -1,6 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { subscribeToBoardCards } from "@/lib/supabase/realtime";
-import type { BoardWithDetails, Card } from "@/types/database";
+import {
+  subscribeToBoardCards,
+  subscribeToBoardGroups,
+} from "@/lib/supabase/realtime";
+import type { BoardWithDetails, Card, Group } from "@/types/database";
 
 const LOADING_DELAY_MS = 200; // Only show spinner if operation takes longer than this
 
@@ -33,7 +36,6 @@ export function useBoard(boardId: string) {
     deleting: new Map(),
   });
 
-
   useEffect(() => {
     // Load initial board data
     fetch(`/api/boards/${boardId}`)
@@ -49,7 +51,7 @@ export function useBoard(boardId: string) {
       });
 
     // Subscribe to realtime updates for live collaboration
-    const unsubscribe = subscribeToBoardCards(
+    const unsubscribeCards = subscribeToBoardCards(
       boardId,
       (newCard) => {
         // Handle new card inserted
@@ -58,7 +60,7 @@ export function useBoard(boardId: string) {
           // Check if card already exists (to prevent duplicates from realtime)
           const cardExists = prev.cards.some((card) => card.id === newCard.id);
           if (cardExists) return prev;
-          
+
           // Add the new card
           return {
             ...prev,
@@ -67,7 +69,7 @@ export function useBoard(boardId: string) {
         });
       },
       (updatedCard) => {
-        // Handle card updated (includes vote updates)
+        // Handle card updated (includes vote updates and group_id changes)
         setBoard((prev) => {
           if (!prev) return null;
           return {
@@ -95,23 +97,77 @@ export function useBoard(boardId: string) {
           return {
             ...prev,
             ...updatedBoard,
-            // Keep existing columns and cards
+            // Keep existing columns, cards, and groups
             columns: prev.columns,
             cards: prev.cards,
+            groups: prev.groups,
+          };
+        });
+      }
+    );
+
+    // Subscribe to realtime updates for groups
+    const unsubscribeGroups = subscribeToBoardGroups(
+      boardId,
+      (newGroup) => {
+        // Handle new group inserted
+        setBoard((prev) => {
+          if (!prev) return null;
+          const groupExists = prev.groups.some(
+            (group) => group.id === newGroup.id
+          );
+          if (groupExists) return prev;
+          return {
+            ...prev,
+            groups: [...prev.groups, newGroup],
+          };
+        });
+      },
+      (updatedGroup) => {
+        // Handle group updated
+        setBoard((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            groups: prev.groups.map((group) =>
+              group.id === updatedGroup.id ? updatedGroup : group
+            ),
+          };
+        });
+      },
+      (deletedGroupId) => {
+        // Handle group deleted - also ungroup all cards in this group
+        setBoard((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            groups: prev.groups.filter((group) => group.id !== deletedGroupId),
+            cards: prev.cards.map((card) =>
+              card.group_id === deletedGroupId
+                ? { ...card, group_id: null }
+                : card
+            ),
           };
         });
       }
     );
 
     return () => {
-      unsubscribe();
+      unsubscribeCards();
+      unsubscribeGroups();
       // Cleanup all loading timeouts
       if (loadingTimeouts.current.addingCard) {
         clearTimeout(loadingTimeouts.current.addingCard);
       }
-      loadingTimeouts.current.voting.forEach((timeout) => clearTimeout(timeout));
-      loadingTimeouts.current.updating.forEach((timeout) => clearTimeout(timeout));
-      loadingTimeouts.current.deleting.forEach((timeout) => clearTimeout(timeout));
+      loadingTimeouts.current.voting.forEach((timeout) =>
+        clearTimeout(timeout)
+      );
+      loadingTimeouts.current.updating.forEach((timeout) =>
+        clearTimeout(timeout)
+      );
+      loadingTimeouts.current.deleting.forEach((timeout) =>
+        clearTimeout(timeout)
+      );
     };
   }, [boardId]);
 
@@ -126,6 +182,7 @@ export function useBoard(boardId: string) {
         content,
         author: author || null,
         votes: 0,
+        group_id: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -437,6 +494,266 @@ export function useBoard(boardId: string) {
     [board]
   );
 
+  const handleCreateGroup = useCallback(
+    async (columnId: string, name: string, cardIds: string[]) => {
+      if (!board) return;
+
+      try {
+        const response = await fetch("/api/groups", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            boardId: board.id,
+            columnId,
+            name,
+          }),
+        });
+
+        if (!response.ok) {
+          console.error("Error creating group:", await response.text());
+          return;
+        }
+
+        const group: Group = await response.json();
+
+        // Assign cards to the group
+        if (cardIds.length > 0) {
+          await fetch(`/api/groups/${group.id}/cards`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cardIds }),
+          });
+        }
+
+        // Optimistic update
+        setBoard((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            groups: [...prev.groups, group],
+            cards: prev.cards.map((card) =>
+              cardIds.includes(card.id) ? { ...card, group_id: group.id } : card
+            ),
+          };
+        });
+      } catch (error) {
+        console.error("Error creating group:", error);
+      }
+    },
+    [board]
+  );
+
+  const handleRenameGroup = useCallback(
+    async (groupId: string, name: string) => {
+      if (!board) return;
+
+      // Optimistic update
+      setBoard((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          groups: prev.groups.map((group) =>
+            group.id === groupId ? { ...group, name } : group
+          ),
+        };
+      });
+
+      try {
+        const response = await fetch(`/api/groups/${groupId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name }),
+        });
+
+        if (!response.ok) {
+          // Rollback on error
+          setBoard((prev) => {
+            if (!prev) return null;
+            const originalGroup = board.groups.find((g) => g.id === groupId);
+            if (!originalGroup) return prev;
+            return {
+              ...prev,
+              groups: prev.groups.map((group) =>
+                group.id === groupId ? originalGroup : group
+              ),
+            };
+          });
+          console.error("Error renaming group:", await response.text());
+        }
+      } catch (error) {
+        // Rollback on error
+        setBoard((prev) => {
+          if (!prev) return null;
+          const originalGroup = board.groups.find((g) => g.id === groupId);
+          if (!originalGroup) return prev;
+          return {
+            ...prev,
+            groups: prev.groups.map((group) =>
+              group.id === groupId ? originalGroup : group
+            ),
+          };
+        });
+        console.error("Error renaming group:", error);
+      }
+    },
+    [board]
+  );
+
+  const handleDeleteGroup = useCallback(
+    async (groupId: string) => {
+      if (!board) return;
+
+      const group = board.groups.find((g) => g.id === groupId);
+      if (!group) return;
+
+      // Optimistic update
+      setBoard((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          groups: prev.groups.filter((g) => g.id !== groupId),
+          cards: prev.cards.map((card) =>
+            card.group_id === groupId ? { ...card, group_id: null } : card
+          ),
+        };
+      });
+
+      try {
+        const response = await fetch(`/api/groups/${groupId}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          // Rollback on error
+          setBoard((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              groups: [...prev.groups, group],
+              cards: prev.cards.map((card) =>
+                card.group_id === null &&
+                prev.cards.some(
+                  (c) => c.id === card.id && c.group_id === groupId
+                )
+                  ? { ...card, group_id: groupId }
+                  : card
+              ),
+            };
+          });
+          console.error("Error deleting group:", await response.text());
+        }
+      } catch (error) {
+        // Rollback on error
+        setBoard((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            groups: [...prev.groups, group],
+          };
+        });
+        console.error("Error deleting group:", error);
+      }
+    },
+    [board]
+  );
+
+  const handleUngroupCard = useCallback(
+    async (cardId: string) => {
+      if (!board) return;
+
+      const card = board.cards.find((c) => c.id === cardId);
+      if (!card || !card.group_id) return;
+
+      // Optimistic update
+      setBoard((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          cards: prev.cards.map((c) =>
+            c.id === cardId ? { ...c, group_id: null } : c
+          ),
+        };
+      });
+
+      try {
+        const response = await fetch(`/api/cards/${cardId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ groupId: null }),
+        });
+
+        if (!response.ok) {
+          // Rollback on error
+          setBoard((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              cards: prev.cards.map((c) => (c.id === cardId ? card : c)),
+            };
+          });
+          console.error("Error ungrouping card:", await response.text());
+        }
+      } catch (error) {
+        // Rollback on error
+        setBoard((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            cards: prev.cards.map((c) => (c.id === cardId ? card : c)),
+          };
+        });
+        console.error("Error ungrouping card:", error);
+      }
+    },
+    [board]
+  );
+
+  const handlePhaseChange = useCallback(
+    async (phase: "gathering" | "grouping" | "voting" | "actions") => {
+      if (!board) return;
+
+      // Optimistic update
+      setBoard((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          phase,
+        };
+      });
+
+      try {
+        const response = await fetch(`/api/boards/${boardId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phase }),
+        });
+
+        if (!response.ok) {
+          // Rollback on error
+          setBoard((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              phase: board.phase,
+            };
+          });
+          console.error("Error updating phase:", await response.text());
+        }
+      } catch (error) {
+        // Rollback on error
+        setBoard((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            phase: board.phase,
+          };
+        });
+        console.error("Error updating phase:", error);
+      }
+    },
+    [board, boardId]
+  );
+
   return {
     board,
     loading,
@@ -446,5 +763,10 @@ export function useBoard(boardId: string) {
     handleVote,
     handleUpdateCard,
     handleDeleteCard,
+    handleCreateGroup,
+    handleRenameGroup,
+    handleDeleteGroup,
+    handleUngroupCard,
+    handlePhaseChange,
   };
 }

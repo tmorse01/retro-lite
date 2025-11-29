@@ -28,12 +28,23 @@ export type Card = {
   content: string;
   author: string | null;
   votes: number;
+  group_id: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type Group = {
+  id: string;
+  board_id: string;
+  column_id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
 };
 
 export type BoardWithDetails = Board & {
   columns: Column[];
   cards: Card[];
+  groups: Group[];
 };
 

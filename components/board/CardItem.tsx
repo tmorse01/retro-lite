@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { LoadingOverlay } from "@/components/ui/spinner";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import type { Card } from "@/types/database";
 
@@ -19,6 +20,10 @@ interface CardItemProps {
   isVoting?: boolean;
   isUpdating?: boolean;
   isDeleting?: boolean;
+  isGroupingMode?: boolean;
+  isSelected?: boolean;
+  onSelectChange?: (cardId: string, selected: boolean) => void;
+  isVotingPhase?: boolean;
 }
 
 export function CardItem({
@@ -29,6 +34,10 @@ export function CardItem({
   isVoting = false,
   isUpdating = false,
   isDeleting = false,
+  isGroupingMode = false,
+  isSelected = false,
+  onSelectChange,
+  isVotingPhase = false,
 }: CardItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(card.content);
@@ -55,9 +64,21 @@ export function CardItem({
           "group relative bg-white rounded-lg border p-4 transition-all hover:shadow-md hover:-translate-y-0.5",
           voteIntensity > 0.5 && "border-primary/50 bg-primary/5",
           voteIntensity > 0.8 && "border-primary bg-primary/10",
-          isDeleting && "opacity-50"
+          isDeleting && "opacity-50",
+          isGroupingMode && isSelected && "ring-2 ring-primary",
+          isGroupingMode && "pl-10"
         )}
       >
+        {isGroupingMode && (
+          <div className="absolute top-2 left-2">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) =>
+                onSelectChange?.(card.id, checked === true)
+              }
+            />
+          </div>
+        )}
         {isEditing ? (
           <div className="space-y-3">
             <Textarea
@@ -99,29 +120,38 @@ export function CardItem({
               </p>
             )}
             <div className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onVote(card.id)}
-                className="h-8"
-                disabled={isVoting || isDeleting}
-              >
-                {isVoting ? (
-                  <>
-                    <Spinner size="sm" className="mr-1" />
-                    <Badge variant="secondary" className="ml-1">
-                      {card.votes}
-                    </Badge>
-                  </>
-                ) : (
-                  <>
-                    <ThumbsUp className="h-4 w-4 mr-1" />
-                    <Badge variant="secondary" className="ml-1">
-                      {card.votes}
-                    </Badge>
-                  </>
-                )}
-              </Button>
+              {isVotingPhase ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onVote(card.id)}
+                  className="h-8"
+                  disabled={isVoting || isDeleting}
+                >
+                  {isVoting ? (
+                    <>
+                      <Spinner size="sm" className="mr-1" />
+                      <Badge variant="secondary" className="ml-1">
+                        {card.votes}
+                      </Badge>
+                    </>
+                  ) : (
+                    <>
+                      <ThumbsUp className="h-4 w-4 mr-1" />
+                      <Badge variant="secondary" className="ml-1">
+                        {card.votes}
+                      </Badge>
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <ThumbsUp className="h-4 w-4 text-muted-foreground" />
+                  <Badge variant="secondary" className="text-xs">
+                    {card.votes}
+                  </Badge>
+                </div>
+              )}
               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Button
                   variant="ghost"

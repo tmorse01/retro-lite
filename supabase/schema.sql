@@ -23,6 +23,17 @@ create table columns (
   unique (board_id, sort_order)
 );
 
+-- Groups: collections of related cards
+create table groups (
+  id uuid primary key default gen_random_uuid(),
+  board_id uuid references boards(id) on delete cascade,
+  column_id uuid references columns(id) on delete cascade,
+  name text not null,
+  sort_order int not null,
+  created_at timestamptz default now(),
+  unique (board_id, column_id, sort_order)
+);
+
 -- Cards: feedback items created by participants
 create table cards (
   id uuid primary key default gen_random_uuid(),
@@ -31,6 +42,7 @@ create table cards (
   content text not null,
   author text,
   votes int not null default 0,
+  group_id uuid references groups(id) on delete set null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -39,6 +51,7 @@ create table cards (
 alter table boards enable row level security;
 alter table columns enable row level security;
 alter table cards enable row level security;
+alter table groups enable row level security;
 
 -- RLS Policies for public boards (MVP)
 -- Allow read/write access to public boards
@@ -92,13 +105,38 @@ create policy "Cards of public boards are editable"
     )
   );
 
--- Enable Realtime for cards, columns, and boards
+-- Allow read/write access to groups of public boards
+create policy "Groups of public boards are viewable"
+  on groups for select
+  using (
+    exists (
+      select 1 from boards
+      where boards.id = groups.board_id
+      and boards.is_public = true
+    )
+  );
+
+create policy "Groups of public boards are editable"
+  on groups for all
+  using (
+    exists (
+      select 1 from boards
+      where boards.id = groups.board_id
+      and boards.is_public = true
+    )
+  );
+
+-- Enable Realtime for cards, columns, groups, and boards
 alter publication supabase_realtime add table cards;
 alter publication supabase_realtime add table columns;
+alter publication supabase_realtime add table groups;
 alter publication supabase_realtime add table boards;
 
 -- Create indexes for better performance
 create index idx_cards_board_id on cards(board_id);
 create index idx_cards_column_id on cards(column_id);
+create index idx_cards_group_id on cards(group_id);
 create index idx_columns_board_id on columns(board_id);
+create index idx_groups_board_id on groups(board_id);
+create index idx_groups_column_id on groups(column_id);
 

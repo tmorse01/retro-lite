@@ -7,37 +7,32 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const { content, author, groupId } = await request.json();
+    const { name, sortOrder } = await request.json();
 
     const supabase = createServerClient();
 
-    const updateData: {
-      content?: string;
-      author?: string | null;
-      group_id?: string | null;
-    } = {};
-    if (content !== undefined) updateData.content = content;
-    if (author !== undefined) updateData.author = author || null;
-    if (groupId !== undefined) updateData.group_id = groupId || null;
+    const updateData: { name?: string; sort_order?: number } = {};
+    if (name !== undefined) updateData.name = name;
+    if (sortOrder !== undefined) updateData.sort_order = sortOrder;
 
-    const { data: card, error } = await supabase
-      .from("cards")
+    const { data: group, error } = await supabase
+      .from("groups")
       .update(updateData)
       .eq("id", id)
       .select()
       .single();
 
-    if (error || !card) {
-      console.error("Error updating card:", error);
+    if (error || !group) {
+      console.error("Error updating group:", error);
       return NextResponse.json(
-        { error: "Failed to update card" },
+        { error: "Failed to update group" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json(card);
+    return NextResponse.json(group);
   } catch (error) {
-    console.error("Error in PATCH /api/cards/[id]:", error);
+    console.error("Error in PATCH /api/groups/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -53,23 +48,26 @@ export async function DELETE(
     const { id } = await params;
     const supabase = createServerClient();
 
-    const { error } = await supabase.from("cards").delete().eq("id", id);
+    // First, ungroup all cards in this group
+    await supabase.from("cards").update({ group_id: null }).eq("group_id", id);
+
+    // Then delete the group
+    const { error } = await supabase.from("groups").delete().eq("id", id);
 
     if (error) {
-      console.error("Error deleting card:", error);
+      console.error("Error deleting group:", error);
       return NextResponse.json(
-        { error: "Failed to delete card" },
+        { error: "Failed to delete group" },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error in DELETE /api/cards/[id]:", error);
+    console.error("Error in DELETE /api/groups/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
-
