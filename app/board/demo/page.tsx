@@ -53,7 +53,7 @@ const initialCards: Card[] = [
     content:
       "The code review process has become much more efficient. We implemented a new policy where PRs are automatically assigned to two reviewers based on code ownership and expertise, which eliminated the 'who should review this?' confusion. We also started using review templates that guide reviewers on what to look for, making reviews more consistent and thorough. The average time from PR creation to merge has dropped from 2 days to under 6 hours.",
     author: "Sarah",
-    votes: 7,
+    votes: 0,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -89,7 +89,7 @@ const initialCards: Card[] = [
     content:
       "The acceptance criteria for user stories are often too vague or incomplete. Developers frequently have to go back to product managers to clarify requirements, which creates delays and frustration on both sides. We need a standardized template for user stories that includes clear acceptance criteria, edge cases, and success metrics. It would also help if product managers could review stories with the tech lead before they're added to the sprint backlog to catch these issues early.",
     author: "Diana",
-    votes: 10,
+    votes: 0,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -113,7 +113,7 @@ const initialCards: Card[] = [
     content:
       "The deployment process is still too manual and error-prone. We have multiple steps that require manual intervention, and it's easy to miss a step or do them in the wrong order. This has led to several production incidents where we forgot to run migrations or update configuration. We should automate the entire deployment pipeline so that deployments are consistent and repeatable. This would also reduce the time spent on deployments and free up developers to work on features instead of babysitting deployments.",
     author: "James",
-    votes: 8,
+    votes: 0,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -137,7 +137,7 @@ const initialCards: Card[] = [
     content:
       "Establishing a weekly sync meeting between engineering and product teams would help improve communication and alignment. Currently, we only interact during sprint planning and when issues arise, which means we're often working with outdated context. A regular 30-minute sync would give us a chance to discuss upcoming features, clarify requirements, and address any concerns before they become blockers. This could replace some of the ad-hoc Slack conversations and make communication more structured and efficient.",
     author: "Frank",
-    votes: 5,
+    votes: 0,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -173,7 +173,7 @@ const initialCards: Card[] = [
     content:
       "We should establish a 'production readiness' checklist that all features must pass before they can be deployed. This would include things like: monitoring and alerting set up, error handling implemented, performance tested, security reviewed, and rollback plan documented. Having this checklist would ensure we don't deploy features that aren't ready for production, which has been a source of several incidents. The checklist could be part of our PR template so it's reviewed as part of the code review process.",
     author: "Iris",
-    votes: 7,
+    votes: 0,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

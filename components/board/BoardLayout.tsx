@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Share2, Download, X } from "lucide-react";
+import { Share2, Download, X, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -90,6 +90,11 @@ export function BoardLayout({
                   </Button>
                 </>
               )}
+              <Link href="/instructions">
+                <Button variant="ghost" size="sm" title="View Instructions">
+                  <HelpCircle className="h-4 w-4" />
+                </Button>
+              </Link>
               <ThemeToggle />
               <Button
                 variant="outline"
