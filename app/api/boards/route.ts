@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { DEFAULT_TEMPLATE } from "@/lib/board-templates";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,12 +34,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create default columns
-    const columns = [
-      { board_id: board.id, title: "Went Well", sort_order: 0 },
-      { board_id: board.id, title: "Needs Improvement", sort_order: 1 },
-      { board_id: board.id, title: "Action Items", sort_order: 2 },
-    ];
+    // Create default columns from template
+    const columns = DEFAULT_TEMPLATE.columns.map((title, index) => ({
+      board_id: board.id,
+      title,
+      sort_order: index,
+    }));
 
     const { error: columnsError } = await supabase
       .from("columns")

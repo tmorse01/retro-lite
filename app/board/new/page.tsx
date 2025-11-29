@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { DEFAULT_TEMPLATE } from "@/lib/board-templates";
 
 export default function NewBoardPage() {
   const router = useRouter();
@@ -86,7 +87,10 @@ export default function NewBoardPage() {
           <div className="space-y-2">
             <Label>Template</Label>
             <div className="p-3 bg-muted rounded-md text-sm">
-              Default: Went Well / Needs Improvement / Action Items
+              <div className="font-medium mb-1">{DEFAULT_TEMPLATE.name}</div>
+              <div className="text-muted-foreground">
+                {DEFAULT_TEMPLATE.columns.join(" / ")}
+              </div>
             </div>
           </div>
 
