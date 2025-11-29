@@ -102,6 +102,59 @@ export function Column({
         </div>
       </div>
 
+      {/* Add Card */}
+      {isAdding ? (
+        <div className="mb-4 space-y-2 border-b pb-4">
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="What went well?"
+            className="min-h-[80px] resize-none"
+            autoFocus
+          />
+          <Input
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder="Your name (optional)"
+            className="text-sm"
+          />
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={handleAdd}
+              className="flex-1"
+              disabled={isAddingCard}
+            >
+              {isAddingCard ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  Adding...
+                </>
+              ) : (
+                "Add Card"
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isAddingCard}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Button
+          variant="outline"
+          className="mb-4 w-full"
+          onClick={() => setIsAdding(true)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Card
+        </Button>
+      )}
+
       {/* Groups and Cards List */}
       <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pt-2">
         {cards.length === 0 ? (
@@ -157,59 +210,6 @@ export function Column({
           </>
         )}
       </div>
-
-      {/* Add Card */}
-      {isAdding ? (
-        <div className="mt-4 space-y-2 border-t pt-4">
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="What went well?"
-            className="min-h-[80px] resize-none"
-            autoFocus
-          />
-          <Input
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Your name (optional)"
-            className="text-sm"
-          />
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleAdd}
-              className="flex-1"
-              disabled={isAddingCard}
-            >
-              {isAddingCard ? (
-                <>
-                  <Spinner size="sm" className="mr-2" />
-                  Adding...
-                </>
-              ) : (
-                "Add Card"
-              )}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isAddingCard}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <Button
-          variant="outline"
-          className="mt-4 w-full"
-          onClick={() => setIsAdding(true)}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Card
-        </Button>
-      )}
     </div>
   );
 }
