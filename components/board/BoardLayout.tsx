@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ShareBoardDialog } from "./ShareBoardDialog";
 import { useState } from "react";
@@ -54,14 +55,13 @@ export function BoardLayout({
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
-              <DropdownMenu
-                trigger={
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
                     <Download className="h-4 w-4 mr-2" />
                     Export
                   </Button>
-                }
-              >
+                </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem onClick={handleExport}>
                     Export as Markdown
