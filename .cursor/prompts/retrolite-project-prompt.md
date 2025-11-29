@@ -1,10 +1,14 @@
 # RetroLite – Weekend Full-Stack Retro Board
+
 **Project Type:** Full-stack web app  
-**Stack:** Next.js (App Router) + TypeScript + Tailwind + shadcn/ui + Supabase (DB/Auth/Realtime) + Vercel + v0.dev + Cursor
+**Stack:** Next.js 16 (App Router) + TypeScript + Tailwind + shadcn/ui + Supabase (DB/Auth/Realtime) + Vercel + v0.dev + Cursor
+
+**IMPORTANT:** This project **MUST** use Next.js 16. Ensure all initialization and setup uses Next.js 16 specifically.
 
 You are an AI pair-programmer helping build **RetroLite**, a super lightweight **sprint retrospective board** app. The goal is to ship a **fully functional, deployed** app in a weekend, with a clean codebase that can be extended later.
 
 This document defines:
+
 - Product vision & UX
 - Tech stack & architecture
 - Data model (Supabase)
@@ -20,6 +24,7 @@ This document defines:
 RetroLite is a **facilitation tool** for Agile/Scrum retrospectives.
 
 **Core use case:**
+
 - A facilitator creates a retro board for a team.
 - Team members open a link and add feedback cards in three columns:
   - **Went Well**
@@ -29,6 +34,7 @@ RetroLite is a **facilitation tool** for Agile/Scrum retrospectives.
 - The facilitator exports the results to share with the team or paste into other tools.
 
 **Key constraints:**
+
 - Must feel **fast, simple, and frictionless**.
 - MVP should work with **no email-based login for participants** (optional later).
 - Designed to work on **desktop and mobile**.
@@ -40,11 +46,13 @@ RetroLite is a **facilitation tool** for Agile/Scrum retrospectives.
 ### 2.1 Must-Have Features
 
 1. **Landing Page**
+
    - Explains what RetroLite is.
    - CTA: “Start a Retro” → creates a new board.
    - CTA: “View Demo Board” → loads a pre-seeded demo board.
 
 2. **Create Board**
+
    - User enters a **board title** (e.g., “Sprint 42 – API Team Retro”).
    - Optional: team/sprint name.
    - On create:
@@ -53,6 +61,7 @@ RetroLite is a **facilitation tool** for Agile/Scrum retrospectives.
      - Redirect to `/board/[id]`.
 
 3. **Board View**
+
    - Display **top navigation** with:
      - App name/logo.
      - Board title.
@@ -74,6 +83,7 @@ RetroLite is a **facilitation tool** for Agile/Scrum retrospectives.
    - Vote count should visually influence card appearance (e.g., more votes = stronger highlight).
 
 4. **Realtime Collaboration**
+
    - Multiple clients can be on the same board and see:
      - New cards appear live.
      - Card edits appear live.
@@ -106,13 +116,21 @@ RetroLite is a **facilitation tool** for Agile/Scrum retrospectives.
 
 ### 3.1 Frontend
 
-- **Framework:** Next.js (App Router)
+- **Framework:** Next.js 16 (App Router) - **REQUIRED VERSION**
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **UI Components:** shadcn/ui
 - **State:** React hooks + local state for UI; React Query optional but not required for MVP.
 - **Realtime:** Supabase Realtime subscriptions on `boards`, `columns`, `cards` tables.
 - **Deployment:** Vercel
+
+**Setup Command:** When initializing the project, use:
+
+```bash
+npx create-next-app@latest . --typescript --tailwind --app --no-src-dir
+```
+
+Then verify `package.json` shows `"next": "^16.0.0"` or higher. If not, update it manually.
 
 ### 3.2 Backend (Supabase)
 
@@ -197,6 +215,7 @@ In a later phase, add support for private boards with owner-only editing.
 **Goal:** Explain RetroLite in one glance and drive users to start a retro.
 
 **Content:**
+
 - Logo + app name: **RetroLite**.
 - Tagline: “Run focused retros in minutes.”
 - Subtext: “Create a retro board, invite your team, capture feedback, and prioritize actions without the bloat.”
@@ -214,11 +233,13 @@ In a later phase, add support for private boards with owner-only editing.
 **Goal:** Small, focused form to create a new board.
 
 Fields:
+
 - Retro Title (required)
 - Optional: Sprint Name / Team Name (can be appended to title)
 - Template selection (non-functional dropdown, just show default template)
 
 Actions:
+
 - “Create Board” → POST to API → redirect to `/board/[id]`.
 
 ### 5.3 `/board/[id]` – Board View
@@ -226,7 +247,9 @@ Actions:
 **Goal:** The main facilitation space.
 
 Layout:
+
 - Top app bar:
+
   - Left: RetroLite logo (small) + board title.
   - Right:
     - Share button → opens modal with share URL & copy button.
@@ -237,18 +260,21 @@ Layout:
   - Mobile: stack columns vertically.
 
 Each column:
+
 - Title (e.g., “Went Well”).
 - Badge showing count of cards.
 - Optional total votes.
 - “Add card” control (either inline input row, or “+ Add card” button → modal).
 
 Each card:
+
 - Card text.
 - Author (small, muted).
 - Vote button with count on the right.
 - Optional actions: Edit, Delete (e.g. icons appearing on hover).
 
 Interactions:
+
 - Adding a card: inserts into Supabase; realtime broadcast updates board.
 - Voting: increments `votes` on that card; realtime update.
 - Editing/deleting: updates/removes card row; realtime update.
@@ -268,12 +294,16 @@ Static, front-end only board for previewing UI without Supabase.
 ### 6.1 API Outline
 
 You can use:
-- **Server actions**, or
-- `/api/*` routes in Next.js calling Supabase client-side or via server-side SDK.
+
+- **Server actions** (Next.js 16 server actions), or
+- `/api/*` routes in Next.js 16 calling Supabase client-side or via server-side SDK.
+
+Note: Next.js 16 includes enhanced server actions and improved App Router features. Prefer server actions for mutations when possible.
 
 Suggested API behaviors:
 
 1. **Create Board**
+
    - `POST /api/boards`
    - Body: `{ title: string }`
    - Creates board + 3 columns:
@@ -283,19 +313,23 @@ Suggested API behaviors:
    - Returns: `{ id, invite_code, ... }`
 
 2. **Get Board Detail**
+
    - `GET /api/boards/[id]`
    - Returns board + columns + cards.
 
 3. **Create Card**
+
    - `POST /api/cards`
    - Body: `{ boardId, columnId, content, author? }`
    - Returns new card.
 
 4. **Update Card**
+
    - `PATCH /api/cards/[id]`
    - Updates `content` and optionally `author`.
 
 5. **Delete Card**
+
    - `DELETE /api/cards/[id]`
 
 6. **Vote Card**
@@ -308,10 +342,12 @@ Suggested API behaviors:
 Channel name example: `board:{boardId}`
 
 Subscribe to:
+
 - Inserts/updates/deletes on `cards` where `board_id = boardId`.
 - Optional: updates to `columns` (for future custom column support).
 
 On receiving events:
+
 - Merge into local state (card add/update/delete).
 - Keep UI optimistic for fast feedback.
 
@@ -322,28 +358,34 @@ On receiving events:
 Implement a set of clean, reusable components:
 
 1. **`AppHeader`**
+
    - Props: `boardTitle?`, optional actions.
    - Renders logo, title, share/export buttons.
 
 2. **`BoardLayout`**
+
    - Arranges header + main content area.
 
 3. **`Column`**
+
    - Props: `title`, `cards`, callbacks for CRUD and vote.
    - Handles add-card UI & empty state.
 
 4. **`CardItem`**
+
    - Shows content, author, vote count.
    - Buttons: upvote, edit, delete.
    - Supports inline edit or modal-based edit.
 
 5. **`ShareBoardDialog`**
+
    - Modal showing share URL and copy button.
 
 6. **`EmptyState`**
    - For when a column has no cards.
 
 Use shadcn/ui primitives for:
+
 - `Button`
 - `Input`
 - `Textarea`
@@ -363,6 +405,7 @@ Use shadcn/ui primitives for:
 - Transitions: `transition-all` for hover/focus states.
 
 Mobile:
+
 - Columns stack vertically.
 - Header stays visible at the top.
 - Buttons large enough for touch.
@@ -373,21 +416,21 @@ Mobile:
 
 Use this prompt in **v0.dev** to generate the initial React/Next.js UI mock (front-end only, with mocked state). You can later wire it to Supabase in Cursor.
 
-```text
+````text
 You are designing the front-end UI for a web app called **RetroLite**.
 
 RetroLite is a super lightweight **sprint retrospective board** used by small dev teams. The app is simple, fast, and focused: one board, three columns, cards, and votes.
 
 ### Tech + Constraints
 
-- Use **React** with **Next.js App Router** style structure.
+- Use **React** with **Next.js 16 App Router** style structure. **MUST be Next.js 16.**
 - Use **TypeScript**.
 - Use **Tailwind CSS** for styling.
 - Use **shadcn/ui** (or similar headless/primitive components) for inputs, buttons, modals, dialogs, dropdowns, and toasts.
 - You do **not** need to wire up a real backend. Use mocked data and local state.
 - Design should be **responsive** for desktop and mobile.
 - Use modern, minimal styling with a calming but slightly playful palette (e.g. soft blues/purples with accent yellows/greens).
-- Prioritize clarity and “facilitation” feel: like a tool a scrum master opens on a TV during standup.
+- Prioritize clarity and "facilitation" feel: like a tool a scrum master opens on a TV during standup.
 
 ---
 
@@ -543,7 +586,7 @@ type Card = {
   author?: string;
   votes: number;
 };
-```
+````
 
 No API calls are required in this mockup.
 
@@ -561,6 +604,7 @@ No API calls are required in this mockup.
   - Card text readable and not tiny.
 
 This is a **front-end-only mockup** that should feel very close to a real app. Focus on clear composition, pleasant visuals, and a facilitation-friendly experience.
+
 ```
 
 ---
@@ -570,7 +614,10 @@ This is a **front-end-only mockup** that should feel very close to a real app. F
 If using multiple Cursor agents / tasks, you can split work like:
 
 1. **Agent: Setup & Tooling**
-   - Initialize Next.js + TypeScript + Tailwind + shadcn/ui.
+   - Initialize **Next.js 16** + TypeScript + Tailwind + shadcn/ui.
+     - Use: `npx create-next-app@latest . --typescript --tailwind --app --no-src-dir`
+     - Verify Next.js 16 is installed: check `package.json` for `"next": "^16.0.0"` or higher.
+     - If needed, manually update: `npm install next@latest react@latest react-dom@latest`
    - Configure Supabase client (server + client helpers).
    - Set up basic layout and global styles.
 
@@ -592,3 +639,4 @@ If using multiple Cursor agents / tasks, you can split work like:
    - Ensure mobile responsiveness and basic accessibility.
 
 The final goal is a **deployed** app on Vercel with Supabase backing it, ready to share as a demo.
+```
