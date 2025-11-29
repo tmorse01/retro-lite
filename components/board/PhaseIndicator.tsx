@@ -25,33 +25,37 @@ const phaseConfig: Record<
     label: "Gathering",
     description: "Gathering ideas...",
     icon: <Lightbulb className="h-3.5 w-3.5" />,
-    activeColor: "bg-primary/10 text-primary border-primary/30",
+    activeColor:
+      "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700",
     inactiveColor:
-      "bg-transparent text-muted-foreground border-transparent hover:bg-primary/5 hover:text-primary",
+      "bg-transparent text-muted-foreground border-transparent hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400",
   },
   grouping: {
     label: "Grouping",
     description: "Grouping related items...",
     icon: <Group className="h-3.5 w-3.5" />,
-    activeColor: "bg-accent/10 text-accent-foreground border-accent/30",
+    activeColor:
+      "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700",
     inactiveColor:
-      "bg-transparent text-muted-foreground border-transparent hover:bg-accent/5 hover:text-accent-foreground",
+      "bg-transparent text-muted-foreground border-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400",
   },
   voting: {
     label: "Voting",
     description: "Voting on priorities...",
     icon: <Vote className="h-3.5 w-3.5" />,
-    activeColor: "bg-primary/10 text-primary border-primary/30",
+    activeColor:
+      "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-700",
     inactiveColor:
-      "bg-transparent text-muted-foreground border-transparent hover:bg-primary/5 hover:text-primary",
+      "bg-transparent text-muted-foreground border-transparent hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400",
   },
   actions: {
     label: "Actions",
     description: "Defining action items...",
     icon: <CheckCircle2 className="h-3.5 w-3.5" />,
-    activeColor: "bg-accent/10 text-accent-foreground border-accent/30",
+    activeColor:
+      "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700",
     inactiveColor:
-      "bg-transparent text-muted-foreground border-transparent hover:bg-accent/5 hover:text-accent-foreground",
+      "bg-transparent text-muted-foreground border-transparent hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400",
   },
 };
 
