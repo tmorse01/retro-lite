@@ -29,7 +29,7 @@ const initialCards: Card[] = [
     content:
       "The collaboration with the design team has been exceptional this sprint. We established a weekly design review session where we could discuss implementation details early, which prevented several potential issues before they reached development. The designers were very responsive to feedback and made adjustments quickly, which kept our velocity high. Having them involved in our daily standups also helped bridge the gap between design intent and technical reality.",
     author: "Alice",
-    votes: 8,
+    votes: 3,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -41,7 +41,7 @@ const initialCards: Card[] = [
     content:
       "Our CI pipeline improvements have made a huge difference in developer experience. We reduced build times from 15 minutes to under 3 minutes by implementing parallel test execution and better caching strategies. The new pipeline also provides much clearer feedback when tests fail, showing exactly which tests failed and why, rather than just a generic error message. This has significantly reduced the time developers spend debugging CI issues.",
     author: "Bob",
-    votes: 12,
+    votes: 5,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -65,7 +65,7 @@ const initialCards: Card[] = [
     content:
       "Our new automated testing strategy has caught several critical bugs before they reached production. We increased our test coverage from 45% to 78% and added integration tests for our most critical user flows. The test suite now runs automatically on every commit and blocks merges if any tests fail. This has given the team much more confidence when deploying, and we've seen a 60% reduction in production bugs since implementing this.",
     author: "Mike",
-    votes: 9,
+    votes: 2,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -77,7 +77,7 @@ const initialCards: Card[] = [
     content:
       "We've been experiencing too many last-minute scope changes that disrupt our sprint planning. Product managers are frequently coming to us mid-sprint with 'urgent' requests that require us to drop planned work. This creates a lot of context switching and makes it difficult to deliver on our commitments. We need a better process for handling urgent requests that doesn't completely derail our sprint goals. Perhaps we could establish a small buffer in each sprint for urgent items, or have a separate 'hotfix' process that doesn't impact sprint velocity.",
     author: "Charlie",
-    votes: 11,
+    votes: 4,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -101,7 +101,7 @@ const initialCards: Card[] = [
     content:
       "Our documentation is scattered across multiple platforms (Confluence, GitHub wikis, Google Docs, Slack threads) making it very difficult to find information when needed. When onboarding new team members, we spend a lot of time just trying to locate the right documentation. We should consolidate our documentation into a single source of truth and establish clear guidelines on what should be documented and where. A documentation audit would also help identify gaps and outdated information that needs to be updated or removed.",
     author: "Emma",
-    votes: 6,
+    votes: 1,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -125,7 +125,7 @@ const initialCards: Card[] = [
     content:
       "We should implement a 'definition of ready' checklist that all user stories must meet before they can be added to a sprint. This would include things like: clear acceptance criteria, design mockups reviewed, technical feasibility confirmed, dependencies identified, and estimated story points. This would prevent us from starting work on stories that aren't actually ready, which has been a recurring problem. The checklist could be enforced in our project management tool so stories literally can't be moved to 'In Progress' until all criteria are met.",
     author: "Eve",
-    votes: 13,
+    votes: 5,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -149,7 +149,7 @@ const initialCards: Card[] = [
     content:
       "We should create a 'tech debt backlog' that we can pull from during slower periods or when we have extra capacity. Currently, tech debt items get lost in the regular backlog and are rarely prioritized. Having a separate backlog would make it easier to track and address technical debt systematically. We could also allocate a percentage of each sprint (maybe 10-20%) specifically for tech debt, ensuring we're continuously improving our codebase rather than letting it accumulate indefinitely.",
     author: "Grace",
-    votes: 9,
+    votes: 0,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -161,7 +161,7 @@ const initialCards: Card[] = [
     content:
       "Implementing a 'lunch and learn' program where team members can share knowledge about new technologies, best practices, or interesting problems they've solved would help spread expertise across the team. This could be done monthly and would help everyone stay up to date with industry trends and learn from each other's experiences. We could rotate presenters so everyone gets a chance to share, and topics could range from technical deep-dives to process improvements. This would also help with team bonding and creating a learning culture.",
     author: "Henry",
-    votes: 4,
+    votes: 0,
     group_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

@@ -13,7 +13,15 @@ export default function Home() {
             <Link href="/" className="text-xl font-bold text-primary">
               RetroLite
             </Link>
-            <ThemeToggle />
+            <div className="flex items-center gap-6">
+              <Link
+                href="/instructions"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Instructions
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -75,9 +83,9 @@ export default function Home() {
                 <Image
                   src="/screenshots/board-overview.png"
                   alt="RetroLite board view showing three columns with cards"
-                  width={1920}
-                  height={1080}
-                  className="w-full h-auto"
+                  width={1600}
+                  height={900}
+                  className="w-full h-auto object-cover"
                   priority
                 />
               </div>
@@ -139,9 +147,9 @@ export default function Home() {
                     <Image
                       src="/screenshots/voting-phase.png"
                       alt="Voting phase showing cards with vote counts"
-                      width={1920}
-                      height={1080}
-                      className="w-full h-auto"
+                      width={1600}
+                      height={900}
+                      className="w-full h-auto object-cover"
                     />
                   </div>
                   <div className="space-y-2">
@@ -158,9 +166,9 @@ export default function Home() {
                     <Image
                       src="/screenshots/grouping-phase.png"
                       alt="Grouping phase showing related cards grouped together"
-                      width={1920}
-                      height={1080}
-                      className="w-full h-auto"
+                      width={1600}
+                      height={900}
+                      className="w-full h-auto object-cover"
                     />
                   </div>
                   <div className="space-y-2">
@@ -171,17 +179,6 @@ export default function Home() {
                       patterns.
                     </p>
                   </div>
-                </div>
-              </div>
-              <div className="flex justify-center">
-                <div className="rounded-lg border bg-card p-4 shadow-lg">
-                  <Image
-                    src="/screenshots/phase-indicators.png"
-                    alt="Phase indicator showing Gathering, Grouping, Voting, and Actions phases"
-                    width={600}
-                    height={100}
-                    className="w-full h-auto max-w-md"
-                  />
                 </div>
               </div>
             </section>
