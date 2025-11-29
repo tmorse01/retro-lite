@@ -640,3 +640,43 @@ If using multiple Cursor agents / tasks, you can split work like:
 
 The final goal is a **deployed** app on Vercel with Supabase backing it, ready to share as a demo.
 ```
+
+---
+
+## 11. Future Features & Enhancements
+
+This section references planned features inspired by Azure DevOps retrospectives and other facilitation best practices. Detailed feature specifications are maintained in separate markdown files for better organization and clarity.
+
+**All future features maintain RetroLite's core principle: fast, simple, and frictionless.**
+
+### Priority Features (Phase 2)
+
+These features are planned for immediate implementation after MVP:
+
+1. **[Phased Retrospective Workflow](./features/01-phased-workflow.md)** - Gather → Group → Vote → Actions workflow
+2. **[Smart Grouping](./features/02-smart-grouping.md)** - Multi-method grouping (better than drag-and-drop)
+3. **[Enhanced Voting](./features/03-enhanced-voting.md)** - Vote limits, distribution, and history
+
+### Additional Planned Features
+
+4. **[Action Items Management](./features/04-action-items.md)** - Assignees, due dates, status tracking
+5. **[Export & Integration](./features/08-export-integration.md)** - PDF, CSV, JSON exports and tool integrations
+
+### Future Enhancements (Phase 3+)
+
+6. **[AI-Powered Features](./features/05-ai-features.md)** - Smart tagging, duplicate detection, summaries
+7. **[Templates & Customization](./features/06-templates-customization.md)** - Retro templates and column customization
+8. **[Collaboration Enhancements](./features/07-collaboration.md)** - Presence, comments, reactions, mentions
+9. **[Analytics & Insights](./features/09-analytics.md)** - Retro history, pattern detection, team health
+10. **[Mobile App](./features/10-mobile-app.md)** - Native iOS/Android applications
+
+### Design Principles for Future Features
+
+- **Progressive Enhancement**: Features should enhance, not complicate, the core experience.
+- **Opt-In Complexity**: Advanced features hidden by default, discoverable when needed.
+- **Mobile-First**: Every feature must work on mobile/touch devices.
+- **Facilitator Control**: Facilitator can enable/disable features per board.
+- **Backward Compatible**: Old boards continue to work as new features are added.
+- **Performance**: Features should not slow down the core retro experience.
+
+Each feature file contains detailed specifications, implementation notes, data model changes, and related feature references.
