@@ -10,17 +10,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ShareBoardDialog } from "./ShareBoardDialog";
+import { PhaseIndicator } from "./PhaseIndicator";
 import { useState } from "react";
+import type { BoardPhase } from "@/types/database";
 
 interface BoardLayoutProps {
   boardTitle: string;
   boardId: string;
+  phase: BoardPhase;
+  onPhaseChange?: (phase: BoardPhase) => void;
   children: React.ReactNode;
 }
 
 export function BoardLayout({
   boardTitle,
   boardId,
+  phase,
+  onPhaseChange,
   children,
 }: BoardLayoutProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -30,23 +36,52 @@ export function BoardLayout({
     alert("Export functionality coming soon!");
   };
 
+  const handlePhaseChange = async (newPhase: BoardPhase) => {
+    try {
+      const response = await fetch(`/api/boards/${boardId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phase: newPhase }),
+      });
+
+      if (response.ok && onPhaseChange) {
+        onPhaseChange(newPhase);
+      } else {
+        console.error("Failed to update phase");
+      }
+    } catch (error) {
+      console.error("Error updating phase:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top App Bar */}
       <header className="border-b bg-background sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Left: Logo + Board Title */}
-            <div className="flex items-center gap-4">
-              <Link href="/" className="text-xl font-bold text-primary">
+            {/* Left: Logo + Board Title + Phase */}
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <Link href="/" className="text-xl font-bold text-primary shrink-0">
                 RetroLite
               </Link>
-              <div className="hidden sm:block h-6 w-px bg-border" />
+              <div className="hidden sm:block h-6 w-px bg-border shrink-0" />
               <h1 className="text-lg font-semibold truncate">{boardTitle}</h1>
+              <div className="hidden md:flex items-center gap-4 ml-auto">
+                <PhaseIndicator
+                  phase={phase}
+                  onPhaseChange={handlePhaseChange}
+                  showControls={true}
+                />
+              </div>
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Mobile phase indicator */}
+              <div className="md:hidden">
+                <PhaseIndicator phase={phase} />
+              </div>
               <Button
                 variant="outline"
                 size="sm"

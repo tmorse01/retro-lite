@@ -59,3 +59,49 @@ export async function GET(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const { phase } = await request.json();
+    const supabase = createServerClient();
+
+    // Validate phase
+    const validPhases = ['gathering', 'grouping', 'voting', 'actions'];
+    if (phase && !validPhases.includes(phase)) {
+      return NextResponse.json(
+        { error: "Invalid phase. Must be one of: gathering, grouping, voting, actions" },
+        { status: 400 }
+      );
+    }
+
+    // Update board
+    const { data: board, error: boardError } = await supabase
+      .from("boards")
+      .update({ 
+        phase: phase || undefined,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (boardError || !board) {
+      return NextResponse.json(
+        { error: "Failed to update board" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(board);
+  } catch (error) {
+    console.error("Error in PATCH /api/boards/[id]:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+

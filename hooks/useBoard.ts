@@ -87,6 +87,19 @@ export function useBoard(boardId: string) {
             cards: prev.cards.filter((card) => card.id !== deletedCardId),
           };
         });
+      },
+      (updatedBoard) => {
+        // Handle board updated (e.g., phase change)
+        setBoard((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            ...updatedBoard,
+            // Keep existing columns and cards
+            columns: prev.columns,
+            cards: prev.cards,
+          };
+        });
       }
     );
 

@@ -5,7 +5,7 @@ import { Column } from "./Column";
 import { useBoard } from "@/hooks/useBoard";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Card } from "@/types/database";
+import type { Card, Board } from "@/types/database";
 
 interface BoardViewProps {
   boardId: string;
@@ -100,8 +100,19 @@ export function BoardView({ boardId }: BoardViewProps) {
       .sort((a, b) => b.votes - a.votes);
   };
 
+  const handlePhaseChange = (newPhase: Board['phase']) => {
+    if (board) {
+      setBoard({ ...board, phase: newPhase });
+    }
+  };
+
   return (
-    <BoardLayout boardTitle={board.title} boardId={board.id}>
+    <BoardLayout
+      boardTitle={board.title}
+      boardId={board.id}
+      phase={board.phase}
+      onPhaseChange={handlePhaseChange}
+    >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {sortedColumns.map((column) => (
           <Column

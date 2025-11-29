@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       .insert({
         title,
         is_public: true,
+        phase: 'gathering', // Default to gathering phase
       })
       .select()
       .single();

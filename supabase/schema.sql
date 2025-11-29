@@ -6,6 +6,7 @@ create table boards (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   invite_code text unique,
+  phase text not null default 'gathering' check (phase in ('gathering', 'grouping', 'voting', 'actions')),
   created_at timestamptz default now(),
   updated_at timestamptz default now(),
   is_public boolean default true
@@ -91,9 +92,10 @@ create policy "Cards of public boards are editable"
     )
   );
 
--- Enable Realtime for cards and columns
+-- Enable Realtime for cards, columns, and boards
 alter publication supabase_realtime add table cards;
 alter publication supabase_realtime add table columns;
+alter publication supabase_realtime add table boards;
 
 -- Create indexes for better performance
 create index idx_cards_board_id on cards(board_id);

@@ -1,5 +1,5 @@
 import { supabase } from "./client";
-import type { Card } from "@/types/database";
+import type { Card, Board } from "@/types/database";
 
 /**
  * Subscribe to realtime changes for cards in a board
@@ -7,13 +7,15 @@ import type { Card } from "@/types/database";
  * @param onInsert Callback when a card is inserted
  * @param onUpdate Callback when a card is updated
  * @param onDelete Callback when a card is deleted
+ * @param onBoardUpdate Optional callback when the board itself is updated (e.g., phase change)
  * @returns A function to unsubscribe
  */
 export function subscribeToBoardCards(
   boardId: string,
   onInsert: (card: Card) => void,
   onUpdate: (card: Card) => void,
-  onDelete: (cardId: string) => void
+  onDelete: (cardId: string) => void,
+  onBoardUpdate?: (board: Board) => void
 ) {
   const channel = supabase
     .channel(`board:${boardId}`)
@@ -52,8 +54,25 @@ export function subscribeToBoardCards(
       (payload) => {
         onDelete(payload.old.id);
       }
-    )
-    .subscribe();
+    );
+
+  // Subscribe to board updates (e.g., phase changes)
+  if (onBoardUpdate) {
+    channel.on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "boards",
+        filter: `id=eq.${boardId}`,
+      },
+      (payload) => {
+        onBoardUpdate(payload.new as Board);
+      }
+    );
+  }
+
+  channel.subscribe();
 
   return () => {
     supabase.removeChannel(channel);

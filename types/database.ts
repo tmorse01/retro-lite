@@ -1,9 +1,12 @@
 // TypeScript types matching the Supabase schema
 
+export type BoardPhase = 'gathering' | 'grouping' | 'voting' | 'actions';
+
 export type Board = {
   id: string;
   title: string;
   invite_code: string | null;
+  phase: BoardPhase;
   created_at: string;
   updated_at: string;
   is_public: boolean;
