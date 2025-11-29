@@ -63,7 +63,7 @@ export function Column({
       </div>
 
       {/* Cards List */}
-      <div className="flex-1 space-y-3 overflow-y-auto min-h-0">
+      <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pt-2">
         {cards.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
             No items yet. Add the first card.
@@ -119,4 +119,3 @@ export function Column({
     </div>
   );
 }
-

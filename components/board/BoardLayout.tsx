@@ -7,7 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ShareBoardDialog } from "./ShareBoardDialog";
 import { useState } from "react";
@@ -18,7 +17,11 @@ interface BoardLayoutProps {
   children: React.ReactNode;
 }
 
-export function BoardLayout({ boardTitle, boardId, children }: BoardLayoutProps) {
+export function BoardLayout({
+  boardTitle,
+  boardId,
+  children,
+}: BoardLayoutProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   const handleExport = () => {
@@ -51,14 +54,15 @@ export function BoardLayout({ boardTitle, boardId, children }: BoardLayoutProps)
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+              <DropdownMenu
+                trigger={
                   <Button variant="outline" size="sm">
                     <Download className="h-4 w-4 mr-2" />
                     Export
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                }
+              >
+                <DropdownMenuContent>
                   <DropdownMenuItem onClick={handleExport}>
                     Export as Markdown
                   </DropdownMenuItem>
@@ -82,4 +86,3 @@ export function BoardLayout({ boardTitle, boardId, children }: BoardLayoutProps)
     </div>
   );
 }
-
