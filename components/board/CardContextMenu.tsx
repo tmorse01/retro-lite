@@ -60,35 +60,9 @@ export function CardContextMenu({
 
   const hasAnyActions = canEditOrDelete || hasGroupingActions;
 
-  // Debug logging
-  console.log("CardContextMenu Debug:", {
-    cardId: card.id,
-    phase,
-    canEditOrDelete,
-    isGroupingMode,
-    columnGroups: columnGroups.length,
-    isInGroup,
-    selectedCardsSize: selectedCards.size,
-    isSelected: selectedCards.has(card.id),
-    hasCreateGroup,
-    hasAddToGroup,
-    hasUngroup,
-    hasMultiSelectGroup,
-    hasGroupingActions,
-    hasAnyActions,
-    onCreateGroup: typeof onCreateGroup,
-    onAddCardsToGroup: typeof onAddCardsToGroup,
-    onUngroupCard: typeof onUngroupCard,
-  });
-
   if (!hasAnyActions) {
-    console.log(
-      "CardContextMenu: No actions available, returning children only"
-    );
     return <>{children}</>;
   }
-
-  console.log("CardContextMenu: Rendering context menu");
 
   const handleToggleSelect = () => {
     onSelectChange?.(card.id, !selectedCards.has(card.id));
@@ -107,38 +81,11 @@ export function CardContextMenu({
   };
 
   return (
-    <ContextMenu
-      onOpenChange={(open) => {
-        console.log("ContextMenu: onOpenChange", open, card.id);
-      }}
-    >
+    <ContextMenu>
       <ContextMenuTrigger asChild>
         <div style={{ display: "contents" }}>{children}</div>
       </ContextMenuTrigger>
-      <ContextMenuContent
-        onCloseAutoFocus={(e) => {
-          console.log("ContextMenuContent: Menu closed", e);
-        }}
-      >
-        {(() => {
-          const itemCount = [
-            canEditOrDelete,
-            isGroupingMode,
-            isGroupingMode && !!onCreateGroup,
-          ].filter(Boolean).length;
-          console.log("Rendering menu items:", {
-            canEditOrDelete,
-            isGroupingMode,
-            onCreateGroup: !!onCreateGroup,
-            showSelect: isGroupingMode,
-            showCreateGroup: isGroupingMode && !!onCreateGroup,
-            itemCount,
-          });
-          if (itemCount === 0) {
-            console.warn("WARNING: No menu items will render!");
-          }
-          return null;
-        })()}
+      <ContextMenuContent>
         {canEditOrDelete && (
           <>
             <ContextMenuItem
