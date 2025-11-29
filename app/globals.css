@@ -8,48 +8,48 @@
     /* Background: Warm off-white for reduced eye strain */
     --background: 40 20% 98%;
     --foreground: 220 20% 15%;
-    
+
     /* Card: Pure white for content surfaces */
     --card: 0 0% 100%;
     --card-foreground: 220 20% 15%;
-    
+
     /* Popover: White for dropdowns and tooltips */
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 15%;
-    
+
     /* Primary: Soft Indigo - trust, calm, reflection */
     --primary: 230 50% 55%;
     --primary-foreground: 0 0% 98%;
-    
+
     /* Secondary: Warm gray for secondary elements */
     --secondary: 220 15% 92%;
     --secondary-foreground: 220 20% 20%;
-    
+
     /* Muted: Cool gray for subtle backgrounds */
     --muted: 220 10% 85%;
     --muted-foreground: 220 10% 45%;
-    
-    /* Accent: Soft Mint - growth and positive action */
-    --accent: 160 40% 65%;
-    --accent-foreground: 160 30% 15%;
-    
+
+    /* Accent: Tailwind default slate */
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+
     /* Destructive: Warm Coral for delete actions */
     --destructive: 0 70% 60%;
     --destructive-foreground: 0 0% 98%;
-    
+
     /* Borders and inputs: Soft gray */
     --border: 220 15% 85%;
     --input: 220 15% 90%;
-    
+
     /* Ring: Primary indigo for focus states */
     --ring: 230 50% 55%;
-    
+
     /* Border radius */
     --radius: 0.5rem;
-    
+
     /* Chart colors: Harmonious palette */
     --chart-1: 230 50% 55%;
-    --chart-2: 160 40% 65%;
+    --chart-2: 210 40% 96%;
     --chart-3: 0 70% 60%;
     --chart-4: 280 50% 65%;
     --chart-5: 40 60% 70%;
@@ -59,45 +59,45 @@
     /* Background: Deep navy for rich, easy-on-eyes base */
     --background: 220 30% 8%;
     --foreground: 220 10% 90%;
-    
+
     /* Card: Dark blue-gray for content surfaces */
     --card: 220 25% 12%;
     --card-foreground: 220 10% 90%;
-    
+
     /* Popover: Dark blue-gray */
     --popover: 220 25% 12%;
     --popover-foreground: 220 10% 90%;
-    
+
     /* Primary: Bright Indigo for better contrast */
     --primary: 230 60% 70%;
     --primary-foreground: 220 30% 10%;
-    
+
     /* Secondary: Dark blue-gray */
     --secondary: 220 20% 18%;
     --secondary-foreground: 220 10% 85%;
-    
+
     /* Muted: Dark gray */
     --muted: 220 15% 20%;
     --muted-foreground: 220 10% 65%;
-    
-    /* Accent: Soft Mint adjusted for dark mode */
-    --accent: 160 45% 60%;
-    --accent-foreground: 160 30% 10%;
-    
+
+    /* Accent: Tailwind default slate for dark mode */
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 96%;
+
     /* Destructive: Bright Coral for visibility */
     --destructive: 0 75% 65%;
     --destructive-foreground: 0 0% 98%;
-    
+
     /* Borders and inputs: Medium gray */
     --border: 220 15% 25%;
     --input: 220 20% 15%;
-    
+
     /* Ring: Bright Indigo for focus */
     --ring: 230 60% 70%;
-    
+
     /* Chart colors: Adjusted for dark mode */
     --chart-1: 230 60% 70%;
-    --chart-2: 160 45% 60%;
+    --chart-2: 217 33% 17%;
     --chart-3: 0 75% 65%;
     --chart-4: 280 55% 70%;
     --chart-5: 40 65% 75%;
@@ -112,4 +112,3 @@
     @apply bg-background text-foreground;
   }
 }
-

@@ -30,10 +30,10 @@
 
 #### Accent Colors
 
-- **Accent**: Soft Mint (`hsl(160, 40%, 65%)`)
-  - Represents growth and positive action
-  - Used for highlights and positive feedback
-  - Foreground: `hsl(160, 30%, 15%)` (dark green)
+- **Accent**: Tailwind Slate (`hsl(210, 40%, 96%)`)
+  - Tailwind's default slate-100 color
+  - Used for highlights and hover states
+  - Foreground: `hsl(222, 47%, 11%)` (slate-900)
 
 #### Semantic Colors
 
@@ -90,9 +90,9 @@
 
 #### Accent Colors
 
-- **Accent**: Soft Mint (`hsl(160, 45%, 60%)`)
-  - Slightly adjusted for dark mode visibility
-  - Foreground: `hsl(160, 30%, 10%)` (very dark green)
+- **Accent**: Tailwind Slate (`hsl(217, 33%, 17%)`)
+  - Tailwind's default slate-800 color for dark mode
+  - Foreground: `hsl(210, 40%, 96%)` (slate-100)
 
 #### Semantic Colors
 
@@ -175,7 +175,7 @@
 
 - Used for vote counts
 - Indigo background for primary badges
-- Mint green for positive indicators
+- Slate for subtle indicators
 
 ## Accessibility
 
@@ -187,7 +187,7 @@
 ## Usage Guidelines
 
 1. **Primary actions** should use the indigo primary color
-2. **Positive feedback** (like votes) can use mint accent
+2. **Hover states and highlights** use slate accent for subtle feedback
 3. **Destructive actions** use coral for clear distinction
 4. **Backgrounds** should remain subtle to keep focus on content
 5. **Borders** should be minimal but present for structure
