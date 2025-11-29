@@ -1,9 +1,22 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Header */}
+      <header className="border-b bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="text-xl font-bold text-primary">
+              RetroLite
+            </Link>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <div className="max-w-4xl w-full text-center space-y-8">

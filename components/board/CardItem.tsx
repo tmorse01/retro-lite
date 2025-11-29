@@ -174,7 +174,7 @@ export function CardItem({
   const cardContent = (
     <div
       className={cn(
-        "group relative bg-white rounded-lg border p-4 transition-all hover:shadow-md hover:-translate-y-0.5 m-2",
+        "group relative bg-card rounded-lg border p-4 transition-all hover:shadow-md hover:-translate-y-0.5 m-2",
         voteIntensity > 0.5 && "border-primary/50 bg-primary/5",
         voteIntensity > 0.8 && "border-primary bg-primary/10",
         isDeleting && "opacity-50",

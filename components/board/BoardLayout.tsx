@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ShareBoardDialog } from "./ShareBoardDialog";
 import { PhaseIndicator } from "./PhaseIndicator";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useState } from "react";
 import type { BoardPhase } from "@/types/database";
 
@@ -89,6 +90,7 @@ export function BoardLayout({
                   </Button>
                 </>
               )}
+              <ThemeToggle />
               <Button
                 variant="outline"
                 size="sm"

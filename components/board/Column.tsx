@@ -97,7 +97,7 @@ export function Column({
     .sort((a, b) => a.sort_order - b.sort_order);
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg border p-4">
+    <div className="flex flex-col h-full bg-card rounded-lg border p-4">
       {/* Column Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">

@@ -60,7 +60,7 @@ export default function NewBoardPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 bg-white p-6 rounded-lg border"
+          className="space-y-4 bg-card p-6 rounded-lg border"
         >
           <div className="space-y-2">
             <Label htmlFor="title">Retro Title *</Label>

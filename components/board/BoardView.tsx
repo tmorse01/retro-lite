@@ -94,7 +94,7 @@ export function BoardView({ boardId }: BoardViewProps) {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="flex flex-col h-full bg-white rounded-lg border p-4"
+                className="flex flex-col h-full bg-card rounded-lg border p-4"
               >
                 <div className="flex items-center justify-between mb-4">
                   <Skeleton className="h-6 w-32" />
@@ -104,7 +104,7 @@ export function BoardView({ boardId }: BoardViewProps) {
                   {[1, 2, 3].map((j) => (
                     <div
                       key={j}
-                      className="bg-white rounded-lg border p-4 space-y-2"
+                      className="bg-card rounded-lg border p-4 space-y-2"
                     >
                       <Skeleton className="h-4 w-full" />
                       <Skeleton className="h-4 w-3/4" />

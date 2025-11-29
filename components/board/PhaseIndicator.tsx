@@ -25,33 +25,33 @@ const phaseConfig: Record<
     label: "Gathering",
     description: "Gathering ideas...",
     icon: <Lightbulb className="h-3.5 w-3.5" />,
-    activeColor: "bg-blue-100 text-blue-800 border-blue-300",
+    activeColor: "bg-primary/10 text-primary border-primary/30",
     inactiveColor:
-      "bg-transparent text-muted-foreground border-transparent hover:bg-blue-50 hover:text-blue-700",
+      "bg-transparent text-muted-foreground border-transparent hover:bg-primary/5 hover:text-primary",
   },
   grouping: {
     label: "Grouping",
     description: "Grouping related items...",
     icon: <Group className="h-3.5 w-3.5" />,
-    activeColor: "bg-purple-100 text-purple-800 border-purple-300",
+    activeColor: "bg-accent/10 text-accent-foreground border-accent/30",
     inactiveColor:
-      "bg-transparent text-muted-foreground border-transparent hover:bg-purple-50 hover:text-purple-700",
+      "bg-transparent text-muted-foreground border-transparent hover:bg-accent/5 hover:text-accent-foreground",
   },
   voting: {
     label: "Voting",
     description: "Voting on priorities...",
     icon: <Vote className="h-3.5 w-3.5" />,
-    activeColor: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    activeColor: "bg-primary/10 text-primary border-primary/30",
     inactiveColor:
-      "bg-transparent text-muted-foreground border-transparent hover:bg-yellow-50 hover:text-yellow-700",
+      "bg-transparent text-muted-foreground border-transparent hover:bg-primary/5 hover:text-primary",
   },
   actions: {
     label: "Actions",
     description: "Defining action items...",
     icon: <CheckCircle2 className="h-3.5 w-3.5" />,
-    activeColor: "bg-green-100 text-green-800 border-green-300",
+    activeColor: "bg-accent/10 text-accent-foreground border-accent/30",
     inactiveColor:
-      "bg-transparent text-muted-foreground border-transparent hover:bg-green-50 hover:text-green-700",
+      "bg-transparent text-muted-foreground border-transparent hover:bg-accent/5 hover:text-accent-foreground",
   },
 };
 
