@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function NewBoardPage() {
   const router = useRouter();
@@ -57,7 +58,10 @@ export default function NewBoardPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg border">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 bg-white p-6 rounded-lg border"
+        >
           <div className="space-y-2">
             <Label htmlFor="title">Retro Title *</Label>
             <Input
@@ -87,11 +91,17 @@ export default function NewBoardPage() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isCreating}>
-            {isCreating ? "Creating..." : "Create Board"}
+            {isCreating ? (
+              <>
+                <Spinner size="sm" className="mr-2" />
+                Creating...
+              </>
+            ) : (
+              "Create Board"
+            )}
           </Button>
         </form>
       </div>
     </div>
   );
 }
-

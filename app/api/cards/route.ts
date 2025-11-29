@@ -3,7 +3,7 @@ import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { boardId, columnId, content, author } = await request.json();
+    const { id, boardId, columnId, content, author } = await request.json();
 
     if (!boardId || !columnId || !content) {
       return NextResponse.json(
@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
     const { data: card, error } = await supabase
       .from("cards")
       .insert({
+        id: id || undefined, // Use provided ID or let DB generate one
         board_id: boardId,
         column_id: columnId,
         content,

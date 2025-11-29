@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import { CardItem } from "./CardItem";
 import type { Card, Column as ColumnType } from "@/types/database";
 
@@ -16,6 +17,10 @@ interface ColumnProps {
   onVote: (cardId: string) => void;
   onUpdateCard: (cardId: string, content: string, author?: string) => void;
   onDeleteCard: (cardId: string) => void;
+  isAddingCard?: boolean;
+  votingCards?: Set<string>;
+  updatingCards?: Set<string>;
+  deletingCards?: Set<string>;
 }
 
 export function Column({
@@ -25,6 +30,10 @@ export function Column({
   onVote,
   onUpdateCard,
   onDeleteCard,
+  isAddingCard = false,
+  votingCards = new Set(),
+  updatingCards = new Set(),
+  deletingCards = new Set(),
 }: ColumnProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [content, setContent] = useState("");
@@ -76,6 +85,9 @@ export function Column({
               onVote={onVote}
               onUpdate={onUpdateCard}
               onDelete={onDeleteCard}
+              isVoting={votingCards.has(card.id)}
+              isUpdating={updatingCards.has(card.id)}
+              isDeleting={deletingCards.has(card.id)}
             />
           ))
         )}
@@ -98,10 +110,27 @@ export function Column({
             className="text-sm"
           />
           <div className="flex gap-2">
-            <Button size="sm" onClick={handleAdd} className="flex-1">
-              Add Card
+            <Button
+              size="sm"
+              onClick={handleAdd}
+              className="flex-1"
+              disabled={isAddingCard}
+            >
+              {isAddingCard ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  Adding...
+                </>
+              ) : (
+                "Add Card"
+              )}
             </Button>
-            <Button size="sm" variant="outline" onClick={handleCancel}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isAddingCard}
+            >
               <X className="h-4 w-4" />
             </Button>
           </div>
