@@ -3,34 +3,91 @@
 import { useState } from "react";
 import { BoardLayout } from "./BoardLayout";
 import { Column } from "./Column";
+import { BoardContextProvider } from "./BoardContext";
 import { useBoard } from "@/hooks/useBoard";
+import { useDemoBoard } from "@/hooks/useDemoBoard";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Card } from "@/types/database";
+import type { Card, BoardWithDetails, BoardPhase } from "@/types/database";
 
 interface BoardViewProps {
   boardId: string;
+  isDemo?: boolean;
+  initialData?: BoardWithDetails;
 }
 
-export function BoardView({ boardId }: BoardViewProps) {
-  const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
+// Component for demo mode
+function BoardViewDemo({
+  boardId,
+  initialData,
+}: {
+  boardId: string;
+  initialData: BoardWithDetails;
+}) {
+  const hookResult = useDemoBoard(initialData);
+  return <BoardViewInternal {...hookResult} />;
+}
 
-  const {
-    board,
-    loading,
-    error,
-    loadingActions,
-    handleAddCard,
-    handleVote,
-    handleUpdateCard,
-    handleDeleteCard,
-    handleCreateGroup,
-    handleRenameGroup,
-    handleDeleteGroup,
-    handleUngroupCard,
-    handleAddCardsToGroup,
-    handlePhaseChange,
-  } = useBoard(boardId);
+// Component for real board mode
+function BoardViewReal({ boardId }: { boardId: string }) {
+  const hookResult = useBoard(boardId);
+  return <BoardViewInternal {...hookResult} />;
+}
+
+// Main component
+export function BoardView({
+  boardId,
+  isDemo = false,
+  initialData,
+}: BoardViewProps) {
+  if (isDemo && initialData) {
+    return <BoardViewDemo boardId={boardId} initialData={initialData} />;
+  }
+  return <BoardViewReal boardId={boardId} />;
+}
+
+// Internal shared implementation
+function BoardViewInternal({
+  board,
+  loading,
+  error,
+  loadingActions,
+  handleAddCard,
+  handleVote,
+  handleUpdateCard,
+  handleDeleteCard,
+  handleCreateGroup,
+  handleRenameGroup,
+  handleDeleteGroup,
+  handleUngroupCard,
+  handleAddCardsToGroup,
+  handlePhaseChange,
+}: {
+  board: BoardWithDetails | null;
+  loading: boolean;
+  error: string | null;
+  loadingActions: {
+    addingCard: string | null;
+    voting: Set<string>;
+    updating: Set<string>;
+    deleting: Set<string>;
+  };
+  handleAddCard: (columnId: string, content: string, author?: string) => void;
+  handleVote: (cardId: string) => void;
+  handleUpdateCard: (cardId: string, content: string, author?: string) => void;
+  handleDeleteCard: (cardId: string) => void;
+  handleCreateGroup: (
+    columnId: string,
+    name: string,
+    cardIds: string[]
+  ) => void;
+  handleRenameGroup?: (groupId: string, name: string) => void;
+  handleDeleteGroup?: (groupId: string) => void;
+  handleUngroupCard: (cardId: string) => void;
+  handleAddCardsToGroup: (groupId: string, cardIds: string[]) => void;
+  handlePhaseChange: (phase: BoardPhase) => void;
+}) {
+  const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
 
   const handleSelectChange = (cardId: string, selected: boolean) => {
     setSelectedCards((prev) => {
@@ -153,44 +210,54 @@ export function BoardView({ boardId }: BoardViewProps) {
   const isGroupingMode = board.phase === "grouping";
 
   return (
-    <BoardLayout
-      boardTitle={board.title}
-      boardId={board.id}
-      phase={board.phase}
-      onPhaseChange={handlePhaseChange}
-      isGroupingMode={isGroupingMode}
-      selectedCards={selectedCards}
-      onCreateGroup={handleCreateGroupFromSelection}
-      onClearSelection={() => setSelectedCards(new Set())}
-      board={board}
+    <BoardContextProvider
+      value={{
+        phase: board.phase,
+        groups: board.groups,
+        selectedCards,
+        allCards: board.cards,
+        isGroupingMode,
+        onCreateGroup: handleCreateGroup,
+        onAddCardsToGroup: handleAddCardsToGroup,
+        onUngroupCard: handleUngroupCard,
+        onSelectChange: handleSelectChange,
+      }}
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {sortedColumns.map((column) => (
-          <Column
-            key={column.id}
-            column={column}
-            cards={getCardsForColumn(column.id)}
-            groups={getGroupsForColumn(column.id)}
-            onAddCard={handleAddCard}
-            onVote={handleVote}
-            onUpdateCard={handleUpdateCard}
-            onDeleteCard={handleDeleteCard}
-            onRenameGroup={handleRenameGroup}
-            onDeleteGroup={handleDeleteGroup}
-            onUngroupCard={handleUngroupCard}
-            onAddCardsToGroup={handleAddCardsToGroup}
-            onCreateGroup={handleCreateGroup}
-            isAddingCard={loadingActions.addingCard === column.id}
-            votingCards={loadingActions.voting}
-            updatingCards={loadingActions.updating}
-            deletingCards={loadingActions.deleting}
-            isGroupingMode={isGroupingMode}
-            selectedCards={selectedCards}
-            onSelectChange={handleSelectChange}
-            phase={board.phase}
-          />
-        ))}
-      </div>
-    </BoardLayout>
+      <BoardLayout
+        boardTitle={board.title}
+        boardId={board.id}
+        phase={board.phase}
+        onPhaseChange={handlePhaseChange}
+        isGroupingMode={isGroupingMode}
+        selectedCards={selectedCards}
+        onCreateGroup={handleCreateGroupFromSelection}
+        onClearSelection={() => setSelectedCards(new Set())}
+        board={board}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {sortedColumns.map((column) => (
+            <Column
+              key={column.id}
+              column={column}
+              cards={getCardsForColumn(column.id)}
+              groups={getGroupsForColumn(column.id)}
+              onAddCard={handleAddCard}
+              onVote={handleVote}
+              onUpdateCard={handleUpdateCard}
+              onDeleteCard={handleDeleteCard}
+              onRenameGroup={handleRenameGroup}
+              onDeleteGroup={handleDeleteGroup}
+              onUngroupCard={handleUngroupCard}
+              onAddCardsToGroup={handleAddCardsToGroup}
+              onCreateGroup={handleCreateGroup}
+              isAddingCard={loadingActions.addingCard === column.id}
+              votingCards={loadingActions.voting}
+              updatingCards={loadingActions.updating}
+              deletingCards={loadingActions.deleting}
+            />
+          ))}
+        </div>
+      </BoardLayout>
+    </BoardContextProvider>
   );
 }

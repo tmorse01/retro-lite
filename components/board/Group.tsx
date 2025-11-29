@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { CardItem } from "./CardItem";
-import type { Card, Group as GroupType, BoardPhase } from "@/types/database";
+import type { Card, Group as GroupType } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 interface GroupProps {
@@ -22,14 +22,9 @@ interface GroupProps {
   onUngroupCard: (cardId: string) => void;
   onAddCardsToGroup?: (groupId: string, cardIds: string[]) => void;
   onCreateGroup?: (columnId: string, name: string, cardIds: string[]) => void;
-  isGroupingMode?: boolean;
-  selectedCards?: Set<string>;
-  onSelectChange?: (cardId: string, selected: boolean) => void;
   votingCards?: Set<string>;
   updatingCards?: Set<string>;
   deletingCards?: Set<string>;
-  isVotingPhase?: boolean;
-  phase?: BoardPhase;
 }
 
 export function Group({
@@ -45,14 +40,9 @@ export function Group({
   onUngroupCard,
   onAddCardsToGroup,
   onCreateGroup,
-  isGroupingMode = false,
-  selectedCards = new Set(),
-  onSelectChange,
   votingCards = new Set(),
   updatingCards = new Set(),
   deletingCards = new Set(),
-  isVotingPhase = false,
-  phase = "gathering",
 }: GroupProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -164,17 +154,6 @@ export function Group({
                   isVoting={votingCards.has(card.id)}
                   isUpdating={updatingCards.has(card.id)}
                   isDeleting={deletingCards.has(card.id)}
-                  isGroupingMode={isGroupingMode}
-                  isSelected={selectedCards.has(card.id)}
-                  onSelectChange={onSelectChange}
-                  isVotingPhase={isVotingPhase}
-                  groups={allColumnGroups}
-                  onCreateGroup={onCreateGroup}
-                  onAddCardsToGroup={onAddCardsToGroup}
-                  onUngroupCard={onUngroupCard}
-                  selectedCards={selectedCards}
-                  allCards={allColumnCards}
-                  phase={phase}
                 />
               </div>
             ))

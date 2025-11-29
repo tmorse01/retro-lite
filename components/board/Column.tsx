@@ -33,10 +33,6 @@ interface ColumnProps {
   votingCards?: Set<string>;
   updatingCards?: Set<string>;
   deletingCards?: Set<string>;
-  isGroupingMode?: boolean;
-  selectedCards?: Set<string>;
-  onSelectChange?: (cardId: string, selected: boolean) => void;
-  phase?: BoardPhase;
 }
 
 export function Column({
@@ -56,10 +52,6 @@ export function Column({
   votingCards = new Set(),
   updatingCards = new Set(),
   deletingCards = new Set(),
-  isGroupingMode = false,
-  selectedCards = new Set(),
-  onSelectChange,
-  phase = "gathering",
 }: ColumnProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [content, setContent] = useState("");
@@ -81,7 +73,6 @@ export function Column({
   };
 
   const totalVotes = cards.reduce((sum, card) => sum + card.votes, 0);
-  const isVotingPhase = phase === "voting";
 
   // Separate cards into grouped and ungrouped
   const groupedCardIds = new Set(
@@ -139,14 +130,9 @@ export function Column({
                   onUngroupCard={onUngroupCard || (() => {})}
                   onAddCardsToGroup={onAddCardsToGroup}
                   onCreateGroup={onCreateGroup}
-                  isGroupingMode={isGroupingMode}
-                  selectedCards={selectedCards}
-                  onSelectChange={onSelectChange}
                   votingCards={votingCards}
                   updatingCards={updatingCards}
                   deletingCards={deletingCards}
-                  isVotingPhase={isVotingPhase}
-                  phase={phase}
                 />
               );
             })}
@@ -164,17 +150,6 @@ export function Column({
                     isVoting={votingCards.has(card.id)}
                     isUpdating={updatingCards.has(card.id)}
                     isDeleting={deletingCards.has(card.id)}
-                    isGroupingMode={isGroupingMode}
-                    isSelected={selectedCards.has(card.id)}
-                    onSelectChange={onSelectChange}
-                    isVotingPhase={isVotingPhase}
-                    groups={groups}
-                    onCreateGroup={onCreateGroup}
-                    onAddCardsToGroup={onAddCardsToGroup}
-                    onUngroupCard={onUngroupCard}
-                    selectedCards={selectedCards}
-                    allCards={cards}
-                    phase={phase}
                   />
                 ))}
               </div>

@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { BoardLayout } from "@/components/board/BoardLayout";
-import { Column } from "@/components/board/Column";
-import type { Card, Column as ColumnType } from "@/types/database";
+import { useMemo } from "react";
+import { BoardView } from "@/components/board/BoardView";
+import type {
+  Card,
+  Column as ColumnType,
+  BoardWithDetails,
+} from "@/types/database";
 import { DEFAULT_TEMPLATE } from "@/lib/board-templates";
 
 // Mock data for demo board
@@ -178,73 +181,22 @@ const initialCards: Card[] = [
 ];
 
 export default function DemoBoardPage() {
-  const [cards, setCards] = useState<Card[]>(initialCards);
-
-  const handleAddCard = (
-    columnId: string,
-    content: string,
-    author?: string
-  ) => {
-    const newCard: Card = {
-      id: `card-${Date.now()}`,
-      board_id: "demo",
-      column_id: columnId,
-      content,
-      author: author || null,
-      votes: 0,
-      group_id: null,
+  // Create initial mock board object
+  const initialBoard = useMemo<BoardWithDetails>(
+    () => ({
+      id: "demo",
+      title: "Demo Retro Board",
+      invite_code: null,
+      phase: "gathering",
+      is_public: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    };
-    setCards([...cards, newCard]);
-  };
-
-  const handleVote = (cardId: string) => {
-    setCards(
-      cards.map((card) =>
-        card.id === cardId ? { ...card, votes: card.votes + 1 } : card
-      )
-    );
-  };
-
-  const handleUpdateCard = (
-    cardId: string,
-    content: string,
-    author?: string
-  ) => {
-    setCards(
-      cards.map((card) =>
-        card.id === cardId ? { ...card, content, author: author || null } : card
-      )
-    );
-  };
-
-  const handleDeleteCard = (cardId: string) => {
-    setCards(cards.filter((card) => card.id !== cardId));
-  };
-
-  const getCardsForColumn = (columnId: string): Card[] => {
-    return cards
-      .filter((card) => card.column_id === columnId)
-      .sort((a, b) => b.votes - a.votes);
-  };
-
-  return (
-    <BoardLayout boardTitle="Demo Retro Board" boardId="demo">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {mockColumns.map((column) => (
-          <Column
-            key={column.id}
-            column={column}
-            cards={getCardsForColumn(column.id)}
-            groups={[]}
-            onAddCard={handleAddCard}
-            onVote={handleVote}
-            onUpdateCard={handleUpdateCard}
-            onDeleteCard={handleDeleteCard}
-          />
-        ))}
-      </div>
-    </BoardLayout>
+      columns: mockColumns,
+      cards: initialCards,
+      groups: [],
+    }),
+    []
   );
+
+  return <BoardView boardId="demo" isDemo={true} initialData={initialBoard} />;
 }
